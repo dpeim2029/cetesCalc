@@ -47,6 +47,17 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-9QP42RNK0G');
+            `,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
