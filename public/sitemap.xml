@@ -8,6 +8,56 @@
     <priority>1.0</priority>
   </url>
   
+  <!-- Education Pages -->
+  <url>
+    <loc>https://cetes.app/educacion</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://cetes.app/educacion/como-invertir-en-cetes-paso-a-paso</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://cetes.app/educacion/cuanto-pagan-los-cetes-rendimiento-neto-isr</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://cetes.app/educacion/cetes-que-plazo-conviene-comparativa</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://cetes.app/educacion/impuestos-en-cetes-isr-retencion-declaracion</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://cetes.app/educacion/cetes-vs-pagare-vs-fondos-de-deuda</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://cetes.app/educacion/son-seguros-los-cetes-riesgos-liquidez-venta-anticipada</loc>
+    <lastmod>2025-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
   <!-- Legal Pages -->
   <url>
     <loc>https://cetes.app/privacy</loc>

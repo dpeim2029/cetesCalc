@@ -264,41 +264,51 @@ export function HistoricalChart() {
               </div>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={chartData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="fecha" tick={{ fontSize: 12 }} tickLine={{ stroke: "hsl(var(--border))" }} />
-                <YAxis
-                  domain={["dataMin - 0.5", "dataMax + 0.5"]}
-                  tick={{ fontSize: 12 }}
-                  tickLine={{ stroke: "hsl(var(--border))" }}
-                  label={{ value: "Tasa (%)", angle: -90, position: "insideLeft" }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-
-                {PLAZO_OPTIONS.map((option) => (
-                  <Line
-                    key={option.value}
-                    type="linear"
-                    dataKey={option.value}
-                    stroke={option.color}
-                    strokeWidth={2}
-                    dot={option.value === "364" ? false : false}
-                    hide={!visibleSeries[option.value]}
-                    connectNulls={option.value === "364" ? true : false}
-                    strokeDasharray={option.value === "364" ? "5 5" : undefined}
+            <div
+              role="img"
+              aria-label={`Gráfica histórica de tasas CETES para el período de ${TIME_PERIODS.find((p) => p.value === selectedPeriod)?.label}. Muestra la evolución de las tasas de rendimiento de CETES de ${Object.entries(
+                visibleSeries,
+              )
+                .filter(([_, visible]) => visible)
+                .map(([plazo, _]) => PLAZO_OPTIONS.find((p) => p.value === plazo)?.label)
+                .join(", ")} según datos oficiales de Banxico.`}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis dataKey="fecha" tick={{ fontSize: 12 }} tickLine={{ stroke: "hsl(var(--border))" }} />
+                  <YAxis
+                    domain={["dataMin - 0.5", "dataMax + 0.5"]}
+                    tick={{ fontSize: 12 }}
+                    tickLine={{ stroke: "hsl(var(--border))" }}
+                    label={{ value: "Tasa (%)", angle: -90, position: "insideLeft" }}
                   />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+                  <Tooltip content={<CustomTooltip />} />
+
+                  {PLAZO_OPTIONS.map((option) => (
+                    <Line
+                      key={option.value}
+                      type="linear"
+                      dataKey={option.value}
+                      stroke={option.color}
+                      strokeWidth={2}
+                      dot={option.value === "364" ? false : false}
+                      hide={!visibleSeries[option.value]}
+                      connectNulls={option.value === "364" ? true : false}
+                      strokeDasharray={option.value === "364" ? "5 5" : undefined}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </div>
 

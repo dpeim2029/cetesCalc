@@ -8,6 +8,9 @@ const RatesDashboard = lazy(() => import("@/components/rates-dashboard").then((m
 const HistoricalChart = lazy(() =>
   import("@/components/historical-chart").then((m) => ({ default: m.HistoricalChart })),
 )
+const EducationSection = lazy(() =>
+  import("@/components/education-section").then((m) => ({ default: m.EducationSection })),
+)
 
 export default function HomePage() {
   return (
@@ -32,6 +35,13 @@ export default function HomePage() {
         <section>
           <Suspense fallback={<LoadingSpinner />}>
             <HistoricalChart />
+          </Suspense>
+        </section>
+
+        {/* Education Section */}
+        <section>
+          <Suspense fallback={<LoadingSpinner />}>
+            <EducationSection />
           </Suspense>
         </section>
 

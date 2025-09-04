@@ -1,5 +1,9 @@
+import createMDX from '@next/mdx'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
@@ -14,7 +18,7 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
-    unoptimized: true, // <UPDATE> Added unoptimized option
+    unoptimized: true,
   },
   
   // Headers for caching and security
@@ -49,7 +53,6 @@ const nextConfig = {
     ]
   },
   
-  // <UPDATE> Added eslint and typescript configurations
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -58,4 +61,11 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+})
+
+export default withMDX(nextConfig)
