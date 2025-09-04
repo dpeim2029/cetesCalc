@@ -3,8 +3,8 @@ import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
-import "./globals.css"
 import { Suspense } from "react"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Calculadora de Rendimiento CETES 2025 - Neto con ISR | Cetes.app",
@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -58,17 +58,13 @@ export default function RootLayout({
             `,
           }}
         />
-
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
-
         <meta name="theme-color" content="#15803d" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
+        <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
         <Analytics />
       </body>
     </html>

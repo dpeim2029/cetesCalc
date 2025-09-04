@@ -4,31 +4,24 @@ import createMDX from '@next/mdx'
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   
-  swcMinify: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts'],
+  },
+  
+  // Compress responses
   compress: true,
-  poweredByHeader: false,
+  
+  // Enable static optimization
   trailingSlash: false,
   
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-  
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-      }
-    }
-    return config
-  },
-  
+  // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
     unoptimized: true,
   },
   
+  // Headers for caching and security
   async headers() {
     return [
       {
