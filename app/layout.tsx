@@ -47,8 +47,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G"></script>
+        <script defer src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G" />
         <script
+          defer
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -61,10 +62,19 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
+        <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
         <meta name="theme-color" content="#15803d" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
+        <Suspense
+          fallback={
+            <div className="min-h-screen bg-background flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          }
+        >
+          {children}
+        </Suspense>
         <Analytics />
       </body>
     </html>
