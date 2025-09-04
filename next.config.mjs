@@ -6,7 +6,6 @@ const nextConfig = {
   
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
-    serverComponentsExternalPackages: ['recharts'],
   },
   
   compress: true,
