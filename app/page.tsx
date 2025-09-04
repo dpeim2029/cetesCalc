@@ -3,6 +3,7 @@ import { CetesCalculator } from "@/components/cetes-calculator"
 import { BrandHeader } from "@/components/brand-header"
 import { LoadingSpinner } from "@/components/loading-spinner"
 import { FAQSection } from "@/components/faq-section"
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer"
 
 const RatesDashboard = lazy(() => import("@/components/rates-dashboard").then((m) => ({ default: m.RatesDashboard })))
 const HistoricalChart = lazy(() =>
@@ -13,6 +14,9 @@ const EducationSection = lazy(() =>
 )
 
 export default function HomePage() {
+  const { ref: ratesDashboardRef, isVisible: ratesDashboardVisible } = useIntersectionObserver()
+  const { ref: historicalChartRef, isVisible: historicalChartVisible } = useIntersectionObserver({ threshold: 0.5 })
+
   return (
     <div className="min-h-screen bg-background">
       <BrandHeader />
@@ -25,17 +29,29 @@ export default function HomePage() {
         </section>
 
         {/* Current Rates Dashboard - Lazy loaded */}
-        <section>
-          <Suspense fallback={<LoadingSpinner />}>
-            <RatesDashboard />
-          </Suspense>
+        <section ref={ratesDashboardRef}>
+          {ratesDashboardVisible ? (
+            <Suspense fallback={<LoadingSpinner />}>
+              <RatesDashboard />
+            </Suspense>
+          ) : (
+            <div className="h-64 flex items-center justify-center">
+              <LoadingSpinner />
+            </div>
+          )}
         </section>
 
-        {/* Historical Chart - Lazy loaded */}
-        <section>
-          <Suspense fallback={<LoadingSpinner />}>
-            <HistoricalChart />
-          </Suspense>
+        {/* Historical Chart - Lazy loaded with lower priority */}
+        <section ref={historicalChartRef}>
+          {historicalChartVisible ? (
+            <Suspense fallback={<LoadingSpinner />}>
+              <HistoricalChart />
+            </Suspense>
+          ) : (
+            <div className="h-80 flex items-center justify-center">
+              <LoadingSpinner />
+            </div>
+          )}
         </section>
 
         {/* Education Section */}
@@ -45,7 +61,7 @@ export default function HomePage() {
           </Suspense>
         </section>
 
-        {/* FAQ Section */}
+        {/* FAQ Section - Load immediately for SEO */}
         <section>
           <FAQSection />
         </section>

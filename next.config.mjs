@@ -6,7 +6,18 @@ const nextConfig = {
   
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
+    optimizeCss: true,
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
+  
+  swcMinify: true,
   
   compress: true,
   poweredByHeader: false,
@@ -15,9 +26,10 @@ const nextConfig = {
   
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
   
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -29,6 +41,26 @@ const nextConfig = {
       ...config.optimization,
       usedExports: true,
       sideEffects: false,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          recharts: {
+            test: /[\\/]node_modules[\\/]recharts[\\/]/,
+            name: 'recharts',
+            chunks: 'async',
+            priority: 10,
+          },
+        },
+      },
+    }
+    
+    if (!dev) {
+      config.target = ['web', 'es2020']
     }
     
     return config
@@ -78,6 +110,15 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Link',
+            value: '</favicon.ico>; rel=preload; as=image',
           },
         ],
       },
