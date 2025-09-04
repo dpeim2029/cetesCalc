@@ -292,24 +292,37 @@ export function HistoricalChart() {
                     .filter(([_, visible]) => visible)
                     .map(([plazo, _]) => PLAZO_OPTIONS.find((p) => p.value === plazo)?.label)
                     .join(", ")} según datos oficiales de Banxico.`}
+                  className="w-full h-full min-h-[320px]"
+                  style={{ width: "100%", height: "320px" }}
                 >
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height={320} minWidth={300} minHeight={320}>
                     <LineChart
                       data={chartData}
                       margin={{
-                        top: 5,
+                        top: 20,
                         right: 30,
-                        left: 20,
-                        bottom: 5,
+                        left: 40,
+                        bottom: 20,
                       }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                      <XAxis dataKey="fecha" tick={{ fontSize: 12 }} tickLine={{ stroke: "hsl(var(--border))" }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                      <XAxis
+                        dataKey="fecha"
+                        tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
+                        tickLine={{ stroke: "hsl(var(--border))" }}
+                        axisLine={{ stroke: "hsl(var(--border))" }}
+                      />
                       <YAxis
                         domain={["dataMin - 0.5", "dataMax + 0.5"]}
-                        tick={{ fontSize: 12 }}
+                        tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
                         tickLine={{ stroke: "hsl(var(--border))" }}
-                        label={{ value: "Tasa (%)", angle: -90, position: "insideLeft" }}
+                        axisLine={{ stroke: "hsl(var(--border))" }}
+                        label={{
+                          value: "Tasa (%)",
+                          angle: -90,
+                          position: "insideLeft",
+                          style: { textAnchor: "middle", fill: "hsl(var(--foreground))" },
+                        }}
                       />
                       <Tooltip content={<CustomTooltip />} />
 
@@ -319,11 +332,12 @@ export function HistoricalChart() {
                           type="linear"
                           dataKey={option.value}
                           stroke={option.color}
-                          strokeWidth={2}
+                          strokeWidth={2.5}
                           dot={false}
                           hide={!visibleSeries[option.value]}
                           connectNulls={option.value === "364"}
-                          strokeDasharray={option.value === "364" ? "5 5" : undefined}
+                          strokeDasharray={option.value === "364" ? "8 4" : undefined}
+                          activeDot={{ r: 4, fill: option.color }}
                         />
                       ))}
                     </LineChart>
