@@ -29,6 +29,12 @@ export function HistoricalChart() {
     PLAZO_OPTIONS.reduce((acc, option) => ({ ...acc, [option.value]: option.visible }), {}),
   )
 
+  console.log("[v0] Visible series state:", visibleSeries)
+  console.log(
+    "[v0] Has visible series:",
+    Object.values(visibleSeries).some((visible) => visible),
+  )
+
   const query28 = useSWR(`/api/historical-data?plazo=28&period=${selectedPeriod}`, fetcher, {
     refreshInterval: 600000,
     revalidateOnFocus: false,
@@ -60,8 +66,11 @@ export function HistoricalChart() {
   const hasError = Object.values(queries).some((query) => query.error)
   const hasVisibleSeries = Object.values(visibleSeries).some((visible) => visible)
 
+  console.log("[v0] Chart states - isLoading:", isLoading, "hasError:", hasError, "hasVisibleSeries:", hasVisibleSeries)
+
   const chartData = useMemo(() => {
-    if (isLoading || hasError || !hasVisibleSeries) {
+    if (isLoading || hasError) {
+      console.log("[v0] Returning empty data due to loading or error state")
       return []
     }
 
@@ -127,7 +136,7 @@ export function HistoricalChart() {
     console.log("[v0] Sample chart data (last 3):", result.slice(-3))
 
     return result
-  }, [selectedPeriod, visibleSeries, isLoading, hasError, hasVisibleSeries])
+  }, [selectedPeriod, visibleSeries, isLoading, hasError])
 
   const dataStats = useMemo(() => {
     const stats = {}
@@ -253,62 +262,75 @@ export function HistoricalChart() {
               <div className="text-center space-y-2">
                 <AlertCircle className="h-8 w-8 text-red-500 mx-auto" />
                 <p className="text-sm text-muted-foreground">Error al cargar datos históricos</p>
-                <p className="text-xs text-muted-foreground">Selecciona al menos una serie para visualizar</p>
+                <p className="text-xs text-muted-foreground">Intenta recargar la página</p>
               </div>
             </div>
-          ) : chartData.length === 0 ? (
+          ) : !hasVisibleSeries ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-2">
                 <BarChart3 className="h-8 w-8 text-muted-foreground mx-auto" />
                 <p className="text-sm text-muted-foreground">Selecciona al menos una serie para visualizar</p>
               </div>
             </div>
-          ) : (
-            <div
-              role="img"
-              aria-label={`Gráfica histórica de tasas CETES para el período de ${TIME_PERIODS.find((p) => p.value === selectedPeriod)?.label}. Muestra la evolución de las tasas de rendimiento de CETES de ${Object.entries(
-                visibleSeries,
-              )
-                .filter(([_, visible]) => visible)
-                .map(([plazo, _]) => PLAZO_OPTIONS.find((p) => p.value === plazo)?.label)
-                .join(", ")} según datos oficiales de Banxico.`}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={chartData}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="fecha" tick={{ fontSize: 12 }} tickLine={{ stroke: "hsl(var(--border))" }} />
-                  <YAxis
-                    domain={["dataMin - 0.5", "dataMax + 0.5"]}
-                    tick={{ fontSize: 12 }}
-                    tickLine={{ stroke: "hsl(var(--border))" }}
-                    label={{ value: "Tasa (%)", angle: -90, position: "insideLeft" }}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-
-                  {PLAZO_OPTIONS.map((option) => (
-                    <Line
-                      key={option.value}
-                      type="linear"
-                      dataKey={option.value}
-                      stroke={option.color}
-                      strokeWidth={2}
-                      dot={option.value === "364" ? false : false}
-                      hide={!visibleSeries[option.value]}
-                      connectNulls={option.value === "364" ? true : false}
-                      strokeDasharray={option.value === "364" ? "5 5" : undefined}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
+          ) : chartData.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center space-y-2">
+                <BarChart3 className="h-8 w-8 text-muted-foreground mx-auto" />
+                <p className="text-sm text-muted-foreground">No hay datos disponibles para el período seleccionado</p>
+              </div>
             </div>
+          ) : (
+            (() => {
+              console.log("[v0] Rendering chart with data points:", chartData.length)
+              console.log("[v0] Chart data sample:", chartData.slice(0, 2))
+              return (
+                <div
+                  role="img"
+                  aria-label={`Gráfica histórica de tasas CETES para el período de ${TIME_PERIODS.find((p) => p.value === selectedPeriod)?.label}. Muestra la evolución de las tasas de rendimiento de CETES de ${Object.entries(
+                    visibleSeries,
+                  )
+                    .filter(([_, visible]) => visible)
+                    .map(([plazo, _]) => PLAZO_OPTIONS.find((p) => p.value === plazo)?.label)
+                    .join(", ")} según datos oficiales de Banxico.`}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={chartData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="fecha" tick={{ fontSize: 12 }} tickLine={{ stroke: "hsl(var(--border))" }} />
+                      <YAxis
+                        domain={["dataMin - 0.5", "dataMax + 0.5"]}
+                        tick={{ fontSize: 12 }}
+                        tickLine={{ stroke: "hsl(var(--border))" }}
+                        label={{ value: "Tasa (%)", angle: -90, position: "insideLeft" }}
+                      />
+                      <Tooltip content={<CustomTooltip />} />
+
+                      {PLAZO_OPTIONS.map((option) => (
+                        <Line
+                          key={option.value}
+                          type="linear"
+                          dataKey={option.value}
+                          stroke={option.color}
+                          strokeWidth={2}
+                          dot={false}
+                          hide={!visibleSeries[option.value]}
+                          connectNulls={option.value === "364"}
+                          strokeDasharray={option.value === "364" ? "5 5" : undefined}
+                        />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )
+            })()
           )}
         </div>
 

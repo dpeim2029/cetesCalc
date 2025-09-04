@@ -42,11 +42,6 @@ const faqData = [
       "Las subastas de Cetes se realizan cada martes por el Banco de México. En ellas se determina la tasa de rendimiento de los Cetes a diferentes plazos (28, 91, 182 y 364 días). Las tasas disponibles en nuestra calculadora se actualizan automáticamente después de cada subasta.",
   },
   {
-    question: "¿Puedo retirar mi dinero antes del plazo?",
-    answer:
-      "Sí, aunque no es lo ideal. Puedes hacer una venta anticipada de tus Cetes, pero es importante saber que: No siempre hay compradores disponibles de inmediato. Es posible que obtengas un rendimiento menor o incluso una pérdida, dependiendo de las tasas vigentes.",
-  },
-  {
     question: "¿Cómo puedo invertir en Cetes?",
     answer: (
       <>
@@ -106,29 +101,6 @@ const faqData = [
         </a>
         . Es una opción accesible para cualquier persona que quiera comenzar a generar rendimientos sin tomar grandes
         riesgos.
-      </>
-    ),
-  },
-  {
-    question: "¿Cuál es el mejor plazo para invertir en Cetes?",
-    answer:
-      "Depende de tus objetivos: Plazo corto (28 días): mayor liquidez. Plazo largo (364 días): mayor rendimiento. Muchos inversionistas eligen diversificar entre distintos plazos para tener una estrategia de inversión más equilibrada.",
-  },
-  {
-    question: "¿Los CETES vencen automáticamente o tengo que reinvertir?",
-    answer: (
-      <>
-        Cuando llega el vencimiento: Puedes retirar el capital y rendimiento, o Configurar una reinversión automática en
-        plataformas como{" "}
-        <a
-          href="https://www.cetesdirecto.com"
-          target="_blank"
-          rel="noreferrer nofollow noopener"
-          className="text-primary hover:underline"
-        >
-          Cetesdirecto
-        </a>
-        .
       </>
     ),
   },
