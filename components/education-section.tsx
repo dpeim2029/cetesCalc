@@ -7,6 +7,14 @@ import Link from "next/link"
 
 const articles = [
   {
+    title: "Aumenta la retención de ISR sobre CETES en 2026: ¿cómo afecta tu inversión?",
+    description:
+      "Descubre cómo el aumento de la retención de ISR del 0.50% al 0.90% en 2026 afectará tus inversiones en CETES. Guía práctica con ejemplos.",
+    slug: "aumenta-retencion-isr-cetes-2026",
+    readTime: "7 min",
+    tags: ["ISR", "2026", "Retención", "Impuestos"],
+  },
+  {
     title: "Cómo invertir en CETES paso a paso (guía con cetesdirecto)",
     description:
       "Guía práctica para invertir en CETES usando cetesdirecto: requisitos, mínimos, cómo comprar en subastas, venta anticipada, ISR y consejos.",
@@ -104,7 +112,12 @@ export function EducationSection() {
 
         {/* CTA to Calculator */}
         <div className="text-center">
-          
+          <Button variant="outline" asChild>
+            <Link href="/calculadora">
+              Calcular rendimiento de CETES
+              <Calculator className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
         </div>
 
         {/* View All Articles */}
