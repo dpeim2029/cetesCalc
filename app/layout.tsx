@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   generator: "v0.app",
   keywords: "cetes, calculadora, rendimiento, inversión, banxico, méxico, ISR",
   authors: [{ name: "Cetes.app" }],
-  viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
   icons: {
     icon: [
@@ -39,6 +38,12 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#15803d",
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,7 +55,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
-        <meta name="theme-color" content="#15803d" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <script

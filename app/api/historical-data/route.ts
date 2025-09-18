@@ -1,9 +1,11 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { fetchHistoricalData, type CetesPlazo } from "@/lib/banxico-api"
 
-export async function GET(request: Request) {
+export const dynamic = "force-dynamic"
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const { searchParams } = request.nextUrl
     const plazo = searchParams.get("plazo") as CetesPlazo
     const period = searchParams.get("period") || "1Y"
 
@@ -31,11 +33,7 @@ export async function GET(request: Request) {
 
     const formattedStartDate = startDate.toISOString().split("T")[0] // Keep YYYY-MM-DD format
 
-    console.log("[v0] Fetching historical data:", { plazo, period, startDate: formattedStartDate, endDate })
-
     const historicalData = await fetchHistoricalData(plazo, formattedStartDate, endDate)
-
-    console.log("[v0] Historical data received:", { dataLength: historicalData.length, plazo })
 
     return NextResponse.json({
       success: true,

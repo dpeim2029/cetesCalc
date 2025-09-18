@@ -6,8 +6,6 @@ const nextConfig = {
   
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
-    optimizeCss: true,
-    webpackBuildWorker: true,
   },
   
   // Compress responses
@@ -21,18 +19,6 @@ const nextConfig = {
       config.optimization.splitChunks = {
         chunks: 'all',
         cacheGroups: {
-          recharts: {
-            name: 'recharts',
-            test: /[\\/]node_modules[\\/]recharts[\\/]/,
-            priority: 30,
-            reuseExistingChunk: true,
-          },
-          lucide: {
-            name: 'lucide',
-            test: /[\\/]node_modules[\\/]lucide-react[\\/]/,
-            priority: 25,
-            reuseExistingChunk: true,
-          },
           vendor: {
             name: 'vendor',
             test: /[\\/]node_modules[\\/]/,
