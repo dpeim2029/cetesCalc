@@ -18,10 +18,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
-      { url: "/favicon-16x16.jpg", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.jpg", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.jpg", sizes: "16x16", type: "image/jpeg" },
+      { url: "/favicon-32x32.jpg", sizes: "32x32", type: "image/jpeg" },
     ],
-    apple: [{ url: "/apple-touch-icon.jpg", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.jpg", sizes: "180x180", type: "image/jpeg" }],
     other: [{ rel: "mask-icon", url: "/safari-pinned-tab.jpg", color: "#15803d" }],
   },
   openGraph: {
@@ -47,6 +47,12 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
+        <meta name="theme-color" content="#15803d" />
+      </head>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G"></script>
         <script
           dangerouslySetInnerHTML={{
@@ -58,12 +64,6 @@ export default function RootLayout({
             `,
           }}
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
-        <meta name="theme-color" content="#15803d" />
-      </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
         <Analytics />
       </body>
