@@ -108,13 +108,13 @@ const faqData = [
 
 export function FAQSection() {
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold text-foreground">Preguntas Frecuentes</h2>
         <p className="text-muted-foreground">Todo lo que necesitas saber sobre los Cetes</p>
       </div>
 
-      <div className="max-w-4xl mx-auto">
+      <div>
         <Accordion type="single" collapsible className="space-y-2">
           {faqData.map((faq, index) => (
             <AccordionItem key={index} value={`item-${index}`} className="border border-border rounded-lg px-4 bg-card">

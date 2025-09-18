@@ -66,7 +66,7 @@ const articles = [
 
 export function EducationSection() {
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-4xl">
       <CardHeader className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
           <BookOpen className="h-6 w-6 text-primary" />
@@ -80,33 +80,32 @@ export function EducationSection() {
         {/* Articles Grid */}
         <div className="grid gap-4 md:grid-cols-1">
           {articles.map((article) => (
-            <div key={article.slug} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-2 flex-1">
-                    <h3 className="font-semibold text-lg leading-tight">{article.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{article.description}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{article.readTime}</span>
-                      <span>•</span>
-                      <div className="flex gap-1">
-                        {article.tags.slice(0, 2).map((tag) => (
-                          <span key={tag} className="bg-muted px-2 py-1 rounded">
-                            {tag}
-                          </span>
-                        ))}
+            <Link key={article.slug} href={`/educacion/${article.slug}`} className="block">
+              <div className="border rounded-lg p-4 hover:bg-muted/50 hover:shadow-md transition-all duration-200 cursor-pointer group">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2 flex-1 min-w-0">
+                      <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{article.description}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{article.readTime}</span>
+                        <span>•</span>
+                        <div className="flex gap-1">
+                          {article.tags.slice(0, 2).map((tag) => (
+                            <span key={tag} className="bg-muted px-2 py-1 rounded">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200 shrink-0" />
                   </div>
-                  <Link href={`/educacion/${article.slug}`}>
-                    <Button variant="outline" size="sm" className="shrink-0 bg-transparent">
-                      Leer
-                      <ArrowRight className="h-3 w-3 ml-1" />
-                    </Button>
-                  </Link>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

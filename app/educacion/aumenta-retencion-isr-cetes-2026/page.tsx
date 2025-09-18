@@ -258,16 +258,28 @@ export default function ISRRetentionArticle() {
         {/* Header */}
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-6">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/educacion">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Educación
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <TrendingUp className="h-4 w-4" />
-                <span>Actualización fiscal 2026</span>
+            <div className="flex items-center justify-between">
+              {/* Website branding on the left */}
+              <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div className="p-2 bg-primary rounded-lg">
+                  <TrendingUp className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div className="text-left">
+                  <h1 className="text-2xl font-bold text-foreground">Cetes.app</h1>
+                </div>
+              </Link>
+
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/educacion">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Educación
+                  </Link>
+                </Button>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <TrendingUp className="h-4 w-4" />
+                  <span>Actualización fiscal 2026</span>
+                </div>
               </div>
             </div>
           </div>

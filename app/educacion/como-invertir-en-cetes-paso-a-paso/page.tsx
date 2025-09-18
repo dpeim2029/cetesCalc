@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Calculator, Home, ArrowLeft } from "lucide-react"
+import { Calculator, Home, ArrowLeft, TrendingUp } from "lucide-react"
 import Link from "next/link"
 
 export const metadata = {
@@ -17,20 +17,29 @@ export default function ComoInvertirEnCetes() {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/educacion">
-                <Button variant="ghost" size="sm">
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div className="p-2 bg-primary rounded-lg">
+                <TrendingUp className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div className="text-left">
+                <h1 className="text-2xl font-bold text-foreground">Cetes.app</h1>
+              </div>
+            </Link>
+
+            <div className="flex items-center gap-4">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/educacion">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Educación
-                </Button>
-              </Link>
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  Inicio
+                </Link>
+              </Button>
             </div>
-            <Button variant="outline" asChild>
-              <Link href="/">
-                <Home className="h-4 w-4 mr-2" />
-                Inicio
-              </Link>
-            </Button>
           </div>
         </div>
       </header>
