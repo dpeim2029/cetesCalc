@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback, memo } from "react"
 import useSWR from "swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,50 @@ const PLAZO_OPTIONS = [
 ]
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
+
+const CalculationResult = memo(
+  ({
+    label,
+    value,
+    icon: Icon,
+    tooltip,
+    className = "",
+    isHighlighted = false,
+  }: {
+    label: string
+    value: string
+    icon: any
+    tooltip?: string
+    className?: string
+    isHighlighted?: boolean
+  }) => (
+    <div
+      className={cn(
+        "flex items-center justify-between p-3 border rounded-lg",
+        isHighlighted && "bg-primary/10 border-2 border-primary",
+        className,
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        <span className={cn("text-sm", isHighlighted && "font-medium text-primary")}>{label}</span>
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p className="text-xs">{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+      <span className={cn("font-semibold", isHighlighted ? "text-xl text-primary" : "text-green-600")}>{value}</span>
+    </div>
+  ),
+)
+
+CalculationResult.displayName = "CalculationResult"
 
 export function CetesCalculator() {
   const [amount, setAmount] = useState<string>("10000")
@@ -66,30 +110,33 @@ export function CetesCalculator() {
     return calculateNetReturn(numericAmount, currentRate, days)
   }, [amount, selectedPlazo, currentRate])
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = useCallback((value: number) => {
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
       currency: "MXN",
       minimumFractionDigits: 2,
     }).format(value)
-  }
+  }, [])
 
-  const formatPercentage = (value: number) => {
+  const formatPercentage = useCallback((value: number) => {
     return `${value.toFixed(2)}%`
-  }
+  }, [])
 
-  const formatNumberWithCommas = (value: string) => {
-    const numericValue = value.replace(/[^\d]/g, "")
+  const formatNumberWithCommas = useCallback((value: string) => {
+    const numericValue = value.replace(/[^\\d]/g, "")
     if (!numericValue) return ""
     return Number(numericValue).toLocaleString("es-MX")
-  }
+  }, [])
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
-    const numericValue = inputValue.replace(/[^\d]/g, "")
-    setAmount(numericValue)
-    setDisplayAmount(formatNumberWithCommas(numericValue))
-  }
+  const handleAmountChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const inputValue = e.target.value
+      const numericValue = inputValue.replace(/[^\\d]/g, "")
+      setAmount(numericValue)
+      setDisplayAmount(formatNumberWithCommas(numericValue))
+    },
+    [formatNumberWithCommas],
+  )
 
   return (
     <TooltipProvider>
@@ -181,50 +228,28 @@ export function CetesCalculator() {
 
             {/* Calculation Results */}
             <div className="grid gap-3">
-              {/* Gross Return */}
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Banknote className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Rendimiento Bruto</span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p className="text-xs">(Monto × Tasa × Días) ÷ 365</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <span className="font-semibold text-green-600">{formatCurrency(calculation.grossReturn)}</span>
-              </div>
+              <CalculationResult
+                label="Rendimiento Bruto"
+                value={formatCurrency(calculation.grossReturn)}
+                icon={Banknote}
+                tooltip="(Monto × Tasa × Días) ÷ 365"
+              />
 
-              {/* ISR Retention */}
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Receipt className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">
-                    Retención ISR (0.50%)
-                    <span className="text-xs text-muted-foreground ml-1">2025</span>
-                  </span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p className="text-xs">(Monto × 0.50% × Días) ÷ 365</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <span className="font-semibold text-red-600">-{formatCurrency(calculation.isrRetention)}</span>
-              </div>
+              <CalculationResult
+                label="Retención ISR (0.50%) 2025"
+                value={`-${formatCurrency(calculation.isrRetention)}`}
+                icon={Receipt}
+                tooltip="(Monto × 0.50% × Días) ÷ 365"
+                className="text-red-600"
+              />
 
-              {/* Net Return - Most Prominent */}
-              <div className="flex items-center justify-between p-4 bg-primary/10 border-2 border-primary rounded-lg">
-                <span className="font-medium text-primary">Rendimiento Neto Total</span>
-                <span className="text-xl font-bold text-primary">{formatCurrency(calculation.netReturn)}</span>
-              </div>
+              <CalculationResult
+                label="Rendimiento Neto Total"
+                value={formatCurrency(calculation.netReturn)}
+                icon={TrendingUp}
+                isHighlighted={true}
+              />
 
-              {/* Total Amount */}
               <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent rounded-lg">
                 <span className="font-medium">Total a Recibir</span>
                 <span className="text-lg font-bold text-foreground">{formatCurrency(calculation.totalAmount)}</span>

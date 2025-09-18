@@ -53,7 +53,6 @@ export default function RootLayout({
         <meta name="theme-color" content="#15803d" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -61,6 +60,14 @@ export default function RootLayout({
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-9QP42RNK0G');
+              
+              // Load GA script after page load to avoid blocking
+              window.addEventListener('load', function() {
+                var script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G';
+                document.head.appendChild(script);
+              });
             `,
           }}
         />

@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import useSWR from "swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, Clock, Loader2, AlertCircle } from "lucide-react"
@@ -15,22 +16,7 @@ const PLAZO_LABELS = {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-export function RatesDashboard() {
-  const {
-    data: ratesResponse,
-    error,
-    isLoading,
-  } = useSWR("/api/cetes-rates", fetcher, {
-    refreshInterval: 300000, // Refresh every 5 minutes
-    revalidateOnFocus: false,
-  })
-
-  const rates = ratesResponse?.data as CetesRate[] | undefined
-  const lastUpdated = ratesResponse?.lastUpdated
-
-  const apiCount = rates?.filter((r) => r.source === "api").length || 0
-  const fallbackCount = rates?.filter((r) => r.source === "fallback").length || 0
-
+const RateCard = memo(({ rate }: { rate: CetesRate }) => {
   const getTrendIcon = (tendencia?: "up" | "down" | "neutral") => {
     switch (tendencia) {
       case "up":
@@ -58,6 +44,49 @@ export function RatesDashboard() {
     const sign = diferencia > 0 ? "+" : ""
     return `${sign}${(diferencia * 100).toFixed(0)} pb`
   }
+
+  return (
+    <div className="p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-muted-foreground">{PLAZO_LABELS[rate.plazo]}</span>
+        <div className="flex items-center gap-1">
+          {getTrendIcon(rate.tendencia)}
+          <div className="flex items-center gap-1 ml-1">
+            <div className={cn("w-2 h-2 rounded-full", rate.source === "api" ? "bg-green-500" : "bg-yellow-500")} />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <div className="text-2xl font-bold text-foreground">{rate.tasa.toFixed(2)}%</div>
+
+        {rate.diferencia !== undefined && (
+          <div className={`text-xs font-medium ${getTrendColor(rate.tendencia)}`}>
+            {formatDifference(rate.diferencia)}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+})
+
+RateCard.displayName = "RateCard"
+
+export function RatesDashboard() {
+  const {
+    data: ratesResponse,
+    error,
+    isLoading,
+  } = useSWR("/api/cetes-rates", fetcher, {
+    refreshInterval: 300000, // Refresh every 5 minutes
+    revalidateOnFocus: false,
+  })
+
+  const rates = ratesResponse?.data as CetesRate[] | undefined
+  const lastUpdated = ratesResponse?.lastUpdated
+
+  const apiCount = rates?.filter((r) => r.source === "api").length || 0
+  const fallbackCount = rates?.filter((r) => r.source === "fallback").length || 0
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Cargando..."
@@ -117,34 +146,7 @@ export function RatesDashboard() {
                   </div>
                 </div>
               ))
-            : rates?.map((rate) => (
-                <div key={rate.plazo} className="p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-muted-foreground">{PLAZO_LABELS[rate.plazo]}</span>
-                    <div className="flex items-center gap-1">
-                      {getTrendIcon(rate.tendencia)}
-                      <div className="flex items-center gap-1 ml-1">
-                        <div
-                          className={cn(
-                            "w-2 h-2 rounded-full",
-                            rate.source === "api" ? "bg-green-500" : "bg-yellow-500",
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="text-2xl font-bold text-foreground">{rate.tasa.toFixed(2)}%</div>
-
-                    {rate.diferencia !== undefined && (
-                      <div className={`text-xs font-medium ${getTrendColor(rate.tendencia)}`}>
-                        {formatDifference(rate.diferencia)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+            : rates?.map((rate) => <RateCard key={rate.plazo} rate={rate} />)}
         </div>
 
         <div className="mt-6 space-y-3">

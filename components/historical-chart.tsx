@@ -1,11 +1,21 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, memo } from "react"
 import useSWR from "swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import dynamic from "next/dynamic"
 import { cn } from "@/lib/utils"
+
+const LineChart = dynamic(() => import("recharts").then((mod) => ({ default: mod.LineChart })), { ssr: false })
+const Line = dynamic(() => import("recharts").then((mod) => ({ default: mod.Line })), { ssr: false })
+const XAxis = dynamic(() => import("recharts").then((mod) => ({ default: mod.XAxis })), { ssr: false })
+const YAxis = dynamic(() => import("recharts").then((mod) => ({ default: mod.YAxis })), { ssr: false })
+const CartesianGrid = dynamic(() => import("recharts").then((mod) => ({ default: mod.CartesianGrid })), { ssr: false })
+const Tooltip = dynamic(() => import("recharts").then((mod) => ({ default: mod.Tooltip })), { ssr: false })
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => ({ default: mod.ResponsiveContainer })), {
+  ssr: false,
+})
 
 const TIME_PERIODS = [
   { value: "6M", label: "6 Meses" },
@@ -23,16 +33,44 @@ const PLAZO_OPTIONS = [
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
+const CustomTooltip = memo(({ active, payload, label, visibleSeries }: any) => {
+  if (active && payload && payload.length) {
+    const fullDate = payload[0]?.payload?.fullDate
+    const formattedDate = fullDate
+      ? new Date(fullDate.split("/").reverse().join("-")).toLocaleDateString("es-MX", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : label
+
+    return (
+      <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+        <p className="font-medium text-foreground mb-2">{formattedDate}</p>
+        {payload.map((entry: any, index: number) => {
+          const plazoOption = PLAZO_OPTIONS.find((p) => p.value === entry.dataKey)
+          if (!plazoOption || !visibleSeries[entry.dataKey]) return null
+
+          return (
+            <div key={index} className="flex items-center gap-2 text-sm">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+              <span className="text-muted-foreground">{plazoOption.label}:</span>
+              <span className="font-semibold">{entry.value}%</span>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+  return null
+})
+
+CustomTooltip.displayName = "CustomTooltip"
+
 export function HistoricalChart() {
   const [selectedPeriod, setSelectedPeriod] = useState("1Y")
   const [visibleSeries, setVisibleSeries] = useState(
     PLAZO_OPTIONS.reduce((acc, option) => ({ ...acc, [option.value]: option.visible }), {}),
-  )
-
-  console.log("[v0] Visible series state:", visibleSeries)
-  console.log(
-    "[v0] Has visible series:",
-    Object.values(visibleSeries).some((visible) => visible),
   )
 
   const query28 = useSWR(`/api/historical-data?plazo=28&period=${selectedPeriod}`, fetcher, {
@@ -66,52 +104,34 @@ export function HistoricalChart() {
   const hasError = Object.values(queries).some((query) => query.error)
   const hasVisibleSeries = Object.values(visibleSeries).some((visible) => visible)
 
-  console.log("[v0] Chart states - isLoading:", isLoading, "hasError:", hasError, "hasVisibleSeries:", hasVisibleSeries)
-
   const chartData = useMemo(() => {
     if (isLoading || hasError) {
-      console.log("[v0] Returning empty data due to loading or error state")
       return []
     }
 
     const allDates = new Set()
     const seriesData = {}
 
-    console.log("[v0] Processing chart data for period:", selectedPeriod)
-
     // First pass: collect all unique dates and organize data by series
     Object.entries(queries).forEach(([plazo, query]) => {
       if (!query.data?.success || !query.data.data) {
-        console.log("[v0] No data for plazo:", plazo)
         return
       }
 
-      console.log("[v0] Processing plazo:", plazo, "data points:", query.data.data.length)
-
       seriesData[plazo] = new Map()
-      query.data.data.forEach((item: any, index: number) => {
+      query.data.data.forEach((item: any) => {
         const dateKey = item.fecha
         const value = item[plazo]
         allDates.add(dateKey)
         seriesData[plazo].set(dateKey, value)
-
-        // Log first and last few data points for 364 series
-        if (plazo === "364" && (index < 3 || index >= query.data.data.length - 3)) {
-          console.log("[v0] 364 data point:", { index, fecha: dateKey, value })
-        }
       })
     })
-
-    console.log("[v0] Total unique dates:", allDates.size)
-    console.log("[v0] Series data keys:", Object.keys(seriesData))
 
     // Convert to array and sort dates
     const sortedDates = Array.from(allDates).sort(
       (a, b) =>
         new Date(a.split("/").reverse().join("-")).getTime() - new Date(b.split("/").reverse().join("-")).getTime(),
     )
-
-    console.log("[v0] Date range:", sortedDates[0], "to", sortedDates[sortedDates.length - 1])
 
     // Second pass: create chart data with all dates, filling missing values with null
     const result = sortedDates.map((dateKey) => {
@@ -131,12 +151,8 @@ export function HistoricalChart() {
       return chartPoint
     })
 
-    console.log("[v0] Final chart data points:", result.length)
-    console.log("[v0] Sample chart data (first 3):", result.slice(0, 3))
-    console.log("[v0] Sample chart data (last 3):", result.slice(-3))
-
     return result
-  }, [selectedPeriod, visibleSeries, isLoading, hasError])
+  }, [selectedPeriod, isLoading, hasError, query28.data, query91.data, query182.data, query364.data])
 
   const dataStats = useMemo(() => {
     const stats = {}
@@ -149,7 +165,7 @@ export function HistoricalChart() {
       }
     })
     return stats
-  }, [selectedPeriod])
+  }, [selectedPeriod, query28.data, query91.data, query182.data, query364.data])
 
   const hasIncompleteData = useMemo(() => {
     if (!dataStats["364"] || !dataStats["91"]) return false
@@ -162,38 +178,6 @@ export function HistoricalChart() {
       ...prev,
       [plazo]: !prev[plazo],
     }))
-  }
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const fullDate = payload[0]?.payload?.fullDate
-      const formattedDate = fullDate
-        ? new Date(fullDate.split("/").reverse().join("-")).toLocaleDateString("es-MX", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })
-        : label
-
-      return (
-        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-medium text-foreground mb-2">{formattedDate}</p>
-          {payload.map((entry: any, index: number) => {
-            const plazoOption = PLAZO_OPTIONS.find((p) => p.value === entry.dataKey)
-            if (!plazoOption || !visibleSeries[entry.dataKey]) return null
-
-            return (
-              <div key={index} className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                <span className="text-muted-foreground">{plazoOption.label}:</span>
-                <span className="font-semibold">{entry.value}%</span>
-              </div>
-            )
-          })}
-        </div>
-      )
-    }
-    return null
   }
 
   return (
@@ -280,71 +264,65 @@ export function HistoricalChart() {
               </div>
             </div>
           ) : (
-            (() => {
-              console.log("[v0] Rendering chart with data points:", chartData.length)
-              console.log("[v0] Chart data sample:", chartData.slice(0, 2))
-              return (
-                <div
-                  role="img"
-                  aria-label={`Gráfica histórica de tasas CETES para el período de ${TIME_PERIODS.find((p) => p.value === selectedPeriod)?.label}. Muestra la evolución de las tasas de rendimiento de CETES de ${Object.entries(
-                    visibleSeries,
-                  )
-                    .filter(([_, visible]) => visible)
-                    .map(([plazo, _]) => PLAZO_OPTIONS.find((p) => p.value === plazo)?.label)
-                    .join(", ")} según datos oficiales de Banxico.`}
-                  className="w-full h-full min-h-[320px]"
-                  style={{ width: "100%", height: "320px" }}
-                >
-                  <ResponsiveContainer width="100%" height={320} minWidth={300} minHeight={320}>
-                    <LineChart
-                      data={chartData}
-                      margin={{
-                        top: 20,
-                        right: 30,
-                        left: 40,
-                        bottom: 20,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                      <XAxis
-                        dataKey="fecha"
-                        tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
-                        tickLine={{ stroke: "hsl(var(--border))" }}
-                        axisLine={{ stroke: "hsl(var(--border))" }}
-                      />
-                      <YAxis
-                        domain={["dataMin - 0.5", "dataMax + 0.5"]}
-                        tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
-                        tickLine={{ stroke: "hsl(var(--border))" }}
-                        axisLine={{ stroke: "hsl(var(--border))" }}
-                        label={{
-                          value: "Tasa (%)",
-                          angle: -90,
-                          position: "insideLeft",
-                          style: { textAnchor: "middle", fill: "hsl(var(--foreground))" },
-                        }}
-                      />
-                      <Tooltip content={<CustomTooltip />} />
-
-                      {PLAZO_OPTIONS.map((option) => (
-                        <Line
-                          key={option.value}
-                          type="linear"
-                          dataKey={option.value}
-                          stroke={option.color}
-                          strokeWidth={2.5}
-                          dot={false}
-                          hide={!visibleSeries[option.value]}
-                          connectNulls={option.value === "364"}
-                          strokeDasharray={option.value === "364" ? "8 4" : undefined}
-                          activeDot={{ r: 4, fill: option.color }}
-                        />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+            <div
+              role="img"
+              aria-label={`Gráfica histórica de tasas CETES para el período de ${TIME_PERIODS.find((p) => p.value === selectedPeriod)?.label}. Muestra la evolución de las tasas de rendimiento de CETES de ${Object.entries(
+                visibleSeries,
               )
-            })()
+                .filter(([_, visible]) => visible)
+                .map(([plazo, _]) => PLAZO_OPTIONS.find((p) => p.value === plazo)?.label)
+                .join(", ")} según datos oficiales de Banxico.`}
+              className="w-full h-full min-h-[320px]"
+              style={{ width: "100%", height: "320px" }}
+            >
+              <ResponsiveContainer width="100%" height={320} minWidth={300} minHeight={320}>
+                <LineChart
+                  data={chartData}
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 40,
+                    bottom: 20,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis
+                    dataKey="fecha"
+                    tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
+                    tickLine={{ stroke: "hsl(var(--border))" }}
+                    axisLine={{ stroke: "hsl(var(--border))" }}
+                  />
+                  <YAxis
+                    domain={["dataMin - 0.5", "dataMax + 0.5"]}
+                    tick={{ fontSize: 12, fill: "hsl(var(--foreground))" }}
+                    tickLine={{ stroke: "hsl(var(--border))" }}
+                    axisLine={{ stroke: "hsl(var(--border))" }}
+                    label={{
+                      value: "Tasa (%)",
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { textAnchor: "middle", fill: "hsl(var(--foreground))" },
+                    }}
+                  />
+                  <Tooltip content={<CustomTooltip visibleSeries={visibleSeries} />} />
+
+                  {PLAZO_OPTIONS.map((option) => (
+                    <Line
+                      key={option.value}
+                      type="linear"
+                      dataKey={option.value}
+                      stroke={option.color}
+                      strokeWidth={2.5}
+                      dot={false}
+                      hide={!visibleSeries[option.value]}
+                      connectNulls={option.value === "364"}
+                      strokeDasharray={option.value === "364" ? "8 4" : undefined}
+                      activeDot={{ r: 4, fill: option.color }}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </div>
 

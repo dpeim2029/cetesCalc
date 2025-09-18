@@ -36,16 +36,13 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
   const cached = apiCache.get<CetesRate[]>(cacheKey)
 
   if (cached) {
-    console.log("[v0] Using cached rates data")
     return cached
   }
 
-  console.log("[v0] Fetching fresh rates data from Banxico API")
   const results: CetesRate[] = []
 
-  for (const [plazo, seriesId] of Object.entries(CETES_SERIES)) {
+  const fetchPromises = Object.entries(CETES_SERIES).map(async ([plazo, seriesId]) => {
     try {
-      console.log(`[v0] Fetching current rate for ${plazo} days (${seriesId})`)
       const currentResponse = await fetch(`${BANXICO_BASE_URL}/series/${seriesId}/datos/oportuno`, {
         headers: {
           "Bmx-Token": BANXICO_TOKEN,
@@ -57,7 +54,6 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
         const currentData = await currentResponse.json()
         const latestData = currentData.bmx.series[0].datos[0]
         const currentRate = Number.parseFloat(latestData.dato)
-        console.log(`[v0] Current rate for ${plazo} days: ${currentRate}% (${latestData.fecha})`)
 
         let tendencia: "up" | "down" | "neutral" = "neutral"
         let diferencia: number | undefined = undefined
@@ -67,7 +63,6 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
           thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
           const startDate = thirtyDaysAgo.toISOString().split("T")[0]
 
-          console.log(`[v0] Fetching recent historical data for ${plazo} days from ${startDate}`)
           const historicalResponse = await fetch(
             `${BANXICO_BASE_URL}/series/${seriesId}/datos/${startDate}/${latestData.fecha}`,
             {
@@ -81,18 +76,11 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
           if (historicalResponse.ok) {
             const historicalData = await historicalResponse.json()
             const datos = historicalData.bmx.series[0].datos
-            console.log(`[v0] Historical data points for ${plazo} days:`, datos?.length || 0)
 
             if (datos && datos.length >= 2) {
               const targetIndex = Math.min(Math.floor(datos.length * 0.7), datos.length - 2)
               const olderRate = Number.parseFloat(datos[targetIndex].dato)
-              const olderDate = datos[targetIndex].fecha
               diferencia = currentRate - olderRate
-
-              console.log(`[v0] ${plazo} days trend calculation:`)
-              console.log(`[v0]   - Older rate (${olderDate}): ${olderRate}%`)
-              console.log(`[v0]   - Current rate (${latestData.fecha}): ${currentRate}%`)
-              console.log(`[v0]   - Difference: ${diferencia} percentage points`)
 
               if (diferencia > 0.05) {
                 tendencia = "up"
@@ -101,36 +89,29 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
               } else {
                 tendencia = "neutral"
               }
-
-              console.log(`[v0]   - Trend: ${tendencia}`)
             } else {
-              console.log(`[v0] Insufficient historical data for ${plazo} days trend calculation`)
               tendencia = "down"
             }
           } else {
-            console.log(`[v0] Failed to fetch historical data for ${plazo} days:`, historicalResponse.status)
             tendencia = "down"
           }
         } catch (trendError) {
-          console.error(`[v0] Error calculating trend for ${plazo}-day Cetes:`, trendError)
           tendencia = "down"
         }
 
-        results.push({
+        return {
           plazo: plazo as CetesPlazo,
           tasa: currentRate,
           fecha: latestData.fecha,
           tendencia,
           diferencia,
-          source: "api",
+          source: "api" as const,
           lastUpdated: new Date().toISOString(),
-        })
+        }
       } else {
         throw new Error(`API call failed for ${plazo} days`)
       }
     } catch (error) {
-      console.error(`[v0] Error fetching ${plazo}-day Cetes rate from API:`, error)
-
       const fallbackRates: Record<string, number> = {
         "28": 9.1,
         "91": 9.02,
@@ -138,16 +119,24 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
         "364": 9.06,
       }
 
-      results.push({
+      return {
         plazo: plazo as CetesPlazo,
         tasa: fallbackRates[plazo],
         fecha: "31/03/2025",
-        tendencia: "down",
-        source: "fallback",
+        tendencia: "down" as const,
+        source: "fallback" as const,
         lastUpdated: "31/03/2025",
-      })
+      }
     }
-  }
+  })
+
+  const settledResults = await Promise.allSettled(fetchPromises)
+
+  settledResults.forEach((result) => {
+    if (result.status === "fulfilled") {
+      results.push(result.value)
+    }
+  })
 
   apiCache.set(cacheKey, results, 60)
   return results
@@ -188,7 +177,6 @@ export async function fetchHistoricalData(
 
     return historicalData
   } catch (error) {
-    console.error("Error fetching historical data:", error)
     return []
   }
 }
