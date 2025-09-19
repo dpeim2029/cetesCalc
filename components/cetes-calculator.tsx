@@ -198,6 +198,7 @@ export function CetesCalculator() {
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-card text-card-foreground border-border",
                     )}
+                    aria-label={`Seleccionar plazo de ${option.label}${selectedPlazo === option.value ? " (seleccionado)" : ""}`}
                   >
                     {option.label}
                   </button>
@@ -270,6 +271,7 @@ export function CetesCalculator() {
                       checked={isrYear === 2026}
                       onCheckedChange={(checked) => setIsrYear(checked ? 2026 : 2025)}
                       className="scale-75"
+                      aria-label={`Cambiar año de retención ISR. Actualmente seleccionado: ${isrYear} (${isrYear === 2025 ? "0.50%" : "0.90%"})`}
                     />
                     <span
                       className={cn("text-xs font-medium", isrYear === 2026 ? "text-primary" : "text-muted-foreground")}
