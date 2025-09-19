@@ -1,5 +1,16 @@
 import { ArrowLeft, FileText } from "lucide-react"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Términos de Uso - Cetes.app",
+  description:
+    "Términos y condiciones de uso de Cetes.app. Información sobre limitaciones de responsabilidad, fuentes de datos y uso apropiado de nuestra calculadora de CETES.",
+  robots: {
+    index: false, // Prevent indexing to avoid competing with main pages
+    follow: true,
+  },
+}
 
 export default function TermsPage() {
   return (

@@ -4,10 +4,16 @@
 User-agent: *
 Allow: /
 
+Disallow: /terms
+
 # Block API routes and admin areas
 Disallow: /api/
 Disallow: /_next/
 Disallow: /admin/
+
+Allow: /calculadora
+Allow: /educacion
+Allow: /faq
 
 # Sitemap location
 Sitemap: https://cetes.app/sitemap.xml
