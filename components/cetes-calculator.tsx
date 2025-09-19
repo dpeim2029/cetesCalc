@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Switch } from "@/components/ui/switch"
 import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle } from "lucide-react"
-import { calculateNetReturn, type CetesPlazo, type CetesRate } from "@/lib/banxico-api"
+import type { CetesPlazo, CetesRate } from "@/lib/banxico-api"
 import { cn } from "@/lib/utils"
 
 const PLAZO_OPTIONS = [
@@ -71,6 +72,7 @@ export function CetesCalculator() {
   const [amount, setAmount] = useState<string>("10000")
   const [displayAmount, setDisplayAmount] = useState<string>("10,000")
   const [selectedPlazo, setSelectedPlazo] = useState<CetesPlazo>("91")
+  const [isrYear, setIsrYear] = useState<2025 | 2026>(2025)
 
   const {
     data: ratesResponse,
@@ -107,8 +109,19 @@ export function CetesCalculator() {
       }
     }
 
-    return calculateNetReturn(numericAmount, currentRate, days)
-  }, [amount, selectedPlazo, currentRate])
+    const isrRate = isrYear === 2025 ? 0.005 : 0.009 // 0.50% for 2025, 0.90% for 2026
+    const grossReturn = (numericAmount * (currentRate / 100) * days) / 365
+    const isrRetention = (numericAmount * isrRate * days) / 365
+    const netReturn = grossReturn - isrRetention
+    const totalAmount = numericAmount + netReturn
+
+    return {
+      grossReturn,
+      isrRetention,
+      netReturn,
+      totalAmount,
+    }
+  }, [amount, selectedPlazo, currentRate, isrYear])
 
   const formatCurrency = useCallback((value: number) => {
     return new Intl.NumberFormat("es-MX", {
@@ -235,13 +248,38 @@ export function CetesCalculator() {
                 tooltip="(Monto × Tasa × Días) ÷ 365"
               />
 
-              <CalculationResult
-                label="Retención ISR (0.50%) 2025"
-                value={`-${formatCurrency(calculation.isrRetention)}`}
-                icon={Receipt}
-                tooltip="(Monto × 0.50% × Días) ÷ 365"
-                className="text-red-600"
-              />
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Receipt className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">Retención ISR</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p className="text-xs">(Monto × {isrYear === 2025 ? "0.50%" : "0.90%"} × Días) ÷ 365</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <div className="flex items-center gap-2 ml-2">
+                    <span
+                      className={cn("text-xs font-medium", isrYear === 2025 ? "text-primary" : "text-muted-foreground")}
+                    >
+                      2025 (0.50%)
+                    </span>
+                    <Switch
+                      checked={isrYear === 2026}
+                      onCheckedChange={(checked) => setIsrYear(checked ? 2026 : 2025)}
+                      className="scale-75"
+                    />
+                    <span
+                      className={cn("text-xs font-medium", isrYear === 2026 ? "text-primary" : "text-muted-foreground")}
+                    >
+                      2026 (0.90%)
+                    </span>
+                  </div>
+                </div>
+                <span className="font-semibold text-red-600">-{formatCurrency(calculation.isrRetention)}</span>
+              </div>
 
               <CalculationResult
                 label="Rendimiento Neto Total"
@@ -302,7 +340,7 @@ export function CetesCalculator() {
                   </>
                 )}
                 <br />
-                Tasa de retención ISR provisional 2025: 0.50%
+                Tasa de retención ISR provisional {isrYear}: {isrYear === 2025 ? "0.50%" : "0.90%"}
               </>
             )}
           </div>
