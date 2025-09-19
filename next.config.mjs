@@ -16,29 +16,24 @@ const nextConfig = {
   
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
+      // Simplified chunk splitting to reduce loading failures
       config.optimization.splitChunks = {
         chunks: 'all',
-        maxSize: 244000, // Limit chunk size to prevent loading issues
+        maxSize: 200000, // Reduced chunk size further
         cacheGroups: {
-          vendor: {
-            name: 'vendor',
-            test: /[\\/]node_modules[\\/]/,
-            priority: 10,
-            reuseExistingChunk: true,
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
+          default: {
             minChunks: 2,
-            priority: 5,
+            priority: -20,
             reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
             chunks: 'all',
           },
         },
       }
-      
-      // Add fallback for chunk loading errors
-      config.output.chunkLoadingGlobal = 'webpackChunkLoad'
     }
     return config
   },

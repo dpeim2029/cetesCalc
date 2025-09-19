@@ -63,19 +63,37 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Handle chunk loading errors
+              let chunkRetryCount = 0;
+              const MAX_CHUNK_RETRIES = 2;
+              
+              function handleChunkError(message) {
+                if (chunkRetryCount < MAX_CHUNK_RETRIES) {
+                  chunkRetryCount++;
+                  console.warn('[v0] Chunk loading error, attempt ' + chunkRetryCount + ', retrying in 1s');
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 1000);
+                } else {
+                  console.error('[v0] Max chunk retry attempts reached, manual reload required');
+                  // Show user-friendly error message
+                  if (typeof window !== 'undefined' && window.document) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.innerHTML = '<div style="position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:12px;border-radius:8px;z-index:9999;font-family:system-ui;">Error de carga. <button onclick="window.location.reload()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;margin-left:8px;cursor:pointer;">Recargar</button></div>';
+                    document.body.appendChild(errorDiv);
+                  }
+                }
+              }
+              
               window.addEventListener('error', function(e) {
                 if (e.message && e.message.includes('Loading chunk')) {
-                  console.warn('[v0] Chunk loading error detected, reloading page');
-                  window.location.reload();
+                  handleChunkError(e.message);
                 }
               });
               
               window.addEventListener('unhandledrejection', function(e) {
                 if (e.reason && e.reason.toString().includes('Loading chunk')) {
-                  console.warn('[v0] Chunk loading promise rejection, reloading page');
                   e.preventDefault();
-                  window.location.reload();
+                  handleChunkError(e.reason.toString());
                 }
               });
 

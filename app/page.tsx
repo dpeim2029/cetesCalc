@@ -19,7 +19,7 @@ export default function HomePage() {
 
       <main className="container mx-auto px-4 py-12 space-y-16">
         {/* Cetes Calculator - Feature Estrella - Above the fold, no lazy loading */}
-        <section className="flex justify-center animate-fade-in">
+        <section id="calculadora" className="flex justify-center animate-fade-in">
           <div className="w-full max-w-4xl">
             <CetesCalculator />
           </div>
