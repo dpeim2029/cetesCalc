@@ -123,7 +123,7 @@ export function CetesCalculator() {
   }, [])
 
   const formatNumberWithCommas = useCallback((value: string) => {
-    const numericValue = value.replace(/[^\\d]/g, "")
+    const numericValue = value.replace(/[^\d]/g, "")
     if (!numericValue) return ""
     return Number(numericValue).toLocaleString("es-MX")
   }, [])
@@ -131,7 +131,7 @@ export function CetesCalculator() {
   const handleAmountChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value
-      const numericValue = inputValue.replace(/[^\\d]/g, "")
+      const numericValue = inputValue.replace(/[^\d]/g, "")
       setAmount(numericValue)
       setDisplayAmount(formatNumberWithCommas(numericValue))
     },
