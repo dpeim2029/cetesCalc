@@ -18,15 +18,27 @@ const nextConfig = {
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
+        maxSize: 244000, // Limit chunk size to prevent loading issues
         cacheGroups: {
           vendor: {
             name: 'vendor',
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
             reuseExistingChunk: true,
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            priority: 5,
+            reuseExistingChunk: true,
+            chunks: 'all',
           },
         },
       }
+      
+      // Add fallback for chunk loading errors
+      config.output.chunkLoadingGlobal = 'webpackChunkLoad'
     }
     return config
   },
@@ -38,7 +50,6 @@ const nextConfig = {
     unoptimized: true,
   },
   
-  // Headers for caching and security
   async headers() {
     return [
       {
@@ -69,6 +80,10 @@ const nextConfig = {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
         ],
       },
       {
@@ -90,6 +105,32 @@ const nextConfig = {
           {
             key: 'Content-Type',
             value: 'image/jpeg',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          },
+        ],
+      },
+      {
+        source: '/(.*).png',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/png',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          },
+        ],
+      },
+      {
+        source: '/(.*).svg',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/svg+xml',
           },
           {
             key: 'Cache-Control',
