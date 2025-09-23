@@ -1,9 +1,9 @@
 "use client"
 
 import { memo } from "react"
-import useSWR from "swr"
+import useSWR from "@/hooks/use-swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, Clock, Loader2, AlertCircle } from "lucide-react"
+import { TrendingUp, TrendingDown, Clock, Loader2, AlertCircle } from "@/components/icons"
 import { cn } from "@/lib/utils"
 import type { CetesRate } from "@/lib/banxico-api"
 

@@ -3,15 +3,31 @@
   <!-- Homepage - Calculadora de Rendimiento CETES -->
   <url>
     <loc>https://cetes.app/</loc>
-    <lastmod>2025-09-03</lastmod>
+    <lastmod>2025-09-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  
+  <!-- Added calculadora route for better SEO -->
+  <url>
+    <loc>https://cetes.app/calculadora</loc>
+    <lastmod>2025-09-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Added FAQ page -->
+  <url>
+    <loc>https://cetes.app/faq</loc>
+    <lastmod>2025-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   
   <!-- Education Pages -->
   <url>
     <loc>https://cetes.app/educacion</loc>
-    <lastmod>2025-09-03</lastmod>
+    <lastmod>2025-09-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -61,21 +77,21 @@
   <!-- Legal Pages -->
   <url>
     <loc>https://cetes.app/privacy</loc>
-    <lastmod>2025-09-03</lastmod>
+    <lastmod>2025-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   
   <url>
     <loc>https://cetes.app/terms</loc>
-    <lastmod>2025-09-03</lastmod>
+    <lastmod>2025-09-19</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://cetes.app/disclaimer</loc>
-    <lastmod>2025-09-03</lastmod>
+    <lastmod>2025-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

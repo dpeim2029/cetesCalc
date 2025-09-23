@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useMemo, useCallback, memo } from "react"
-import useSWR from "swr"
+import useSWR from "@/hooks/use-swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Switch } from "@/components/ui/switch"
-import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle } from "lucide-react"
+import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle } from "@/components/icons"
 import type { CetesPlazo, CetesRate } from "@/lib/banxico-api"
 import { cn } from "@/lib/utils"
 
@@ -84,6 +84,8 @@ export function CetesCalculator() {
   })
 
   const rates = ratesResponse?.data as CetesRate[] | undefined
+  const lastUpdated = ratesResponse?.lastUpdated
+  const dataSource = ratesResponse?.source
 
   const currentRate = useMemo(() => {
     if (!rates) return 10.45 // Fallback rate while loading
@@ -322,23 +324,24 @@ export function CetesCalculator() {
               <span className="text-red-500">Error al obtener tasas • Usando tasas de referencia</span>
             ) : (
               <>
-                {currentRateData?.source === "api" ? (
+                {dataSource === "database" ? (
                   <>
-                    <span className="text-green-600 font-medium">✓ Datos en tiempo real de Banxico</span> • Última
+                    <span className="text-green-600 font-medium">✓ Datos actualizados desde Banxico</span> • Última
                     actualización:{" "}
-                    {new Date().toLocaleDateString("es-MX", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {lastUpdated
+                      ? new Date(lastUpdated).toLocaleDateString("es-MX", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "No disponible"}
                   </>
                 ) : (
                   <>
-                    <span className="text-yellow-600 font-medium">⚠ Usando datos de referencia</span> • Solo tasa de 28
-                    días disponible vía API • Otras tasas: datos oficiales del{" "}
-                    {currentRateData?.lastUpdated || "31/03/2025"}
+                    <span className="text-yellow-600 font-medium">⚠ Usando datos de referencia</span> • Tasas
+                    actualizadas automáticamente días hábiles a las 6:00 AM y 1:00 PM
                   </>
                 )}
                 <br />

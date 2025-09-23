@@ -1,4 +1,4 @@
-import { TrendingUp, Calculator, BarChart3 } from "lucide-react"
+import { TrendingUp, Calculator, BarChart3 } from "@/components/icons"
 
 export function BrandHeader() {
   return (
