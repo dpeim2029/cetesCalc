@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useMemo, memo } from "react"
-import useSWR from "@/hooks/use-swr"
+import useSWR from "swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart3, Eye, EyeOff, Loader2, AlertCircle } from "@/components/icons"
+import { BarChart3, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import dynamic from "next/dynamic"
 import { cn } from "@/lib/utils"
 

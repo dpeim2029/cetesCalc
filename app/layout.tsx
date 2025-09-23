@@ -1,19 +1,10 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-// import { Analytics } from "@vercel/analytics/next"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
+import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
 
 export const metadata: Metadata = {
   title: "Calculadora de Rendimiento CETES 2025 - Neto con ISR | Cetes.app",
@@ -59,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="es">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -68,7 +59,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon-16x16.jpg" sizes="16x16" type="image/png" />
         <link rel="icon" href="/favicon-32x32.jpg" sizes="32x32" type="image/png" />
       </head>
-      <body className="font-sans antialiased">
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -122,7 +113,7 @@ export default function RootLayout({
           }}
         />
         <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
-        {/* <Analytics /> */}
+        <Analytics />
       </body>
     </html>
   )

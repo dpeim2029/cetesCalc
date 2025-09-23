@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useMemo, useCallback, memo } from "react"
-import useSWR from "@/hooks/use-swr"
+import useSWR from "swr"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Switch } from "@/components/ui/switch"
-import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle } from "@/components/icons"
+import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle } from "lucide-react"
 import type { CetesPlazo, CetesRate } from "@/lib/banxico-api"
 import { cn } from "@/lib/utils"
 
