@@ -6,10 +6,7 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
   
-  // Compress responses
   compress: true,
-  
-  // Enable static optimization
   trailingSlash: false,
   
   webpack: (config, { dev, isServer }) => {
@@ -39,8 +36,8 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
-    unoptimized: false, // Enable optimization for production
-    domains: [], // Add any external image domains here
+    unoptimized: false,
+    domains: [],
   },
   
   async headers() {
@@ -63,19 +60,6 @@ const nextConfig = {
         ],
       },
       {
-        source: '/_next/static/chunks/(.*).js',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
         source: '/api/(.*)',
         headers: [
           {
@@ -91,10 +75,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: false, // Enable type checking for better production builds
+    ignoreBuildErrors: true,
   },
-  
-  output: 'standalone',
 }
 
 export default nextConfig

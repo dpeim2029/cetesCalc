@@ -11,8 +11,7 @@ export async function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("[v0] Missing Supabase environment variables")
-    throw new Error("Missing Supabase configuration")
+    throw new Error("Missing required Supabase environment variables")
   }
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -41,8 +40,7 @@ export function createServiceClient() {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error("[v0] Missing Supabase service role environment variables")
-    throw new Error("Missing Supabase service role configuration")
+    throw new Error("Missing required Supabase service role environment variables")
   }
 
   return createServerClient(supabaseUrl, supabaseServiceKey, {

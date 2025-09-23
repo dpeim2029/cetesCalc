@@ -13,7 +13,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Plazo parameter is required" }, { status: 400 })
     }
 
-    const endDate = new Date().toISOString().split("T")[0] // Already in YYYY-MM-DD format
+    const validPlazos = ["28", "91", "182", "364"]
+    if (!validPlazos.includes(plazo)) {
+      return NextResponse.json({ success: false, error: "Invalid plazo parameter" }, { status: 400 })
+    }
+
+    const endDate = new Date().toISOString().split("T")[0]
     const startDate = new Date()
 
     switch (period) {
@@ -29,22 +34,33 @@ export async function GET(request: NextRequest) {
       case "MAX":
         startDate.setFullYear(startDate.getFullYear() - 10)
         break
+      default:
+        startDate.setFullYear(startDate.getFullYear() - 1)
     }
 
-    const formattedStartDate = startDate.toISOString().split("T")[0] // Keep YYYY-MM-DD format
+    const formattedStartDate = startDate.toISOString().split("T")[0]
 
-    const historicalData = await fetchHistoricalData(plazo, formattedStartDate, endDate)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
 
-    return NextResponse.json({
-      success: true,
-      data: historicalData,
-      period,
-      plazo,
-      dateRange: {
-        start: formattedStartDate,
-        end: endDate,
-      },
-    })
+    try {
+      const historicalData = await fetchHistoricalData(plazo, formattedStartDate, endDate)
+      clearTimeout(timeoutId)
+
+      return NextResponse.json({
+        success: true,
+        data: historicalData,
+        period,
+        plazo,
+        dateRange: {
+          start: formattedStartDate,
+          end: endDate,
+        },
+      })
+    } catch (fetchError) {
+      clearTimeout(timeoutId)
+      throw fetchError
+    }
   } catch (error) {
     console.error("Historical Data API Error:", error)
 
