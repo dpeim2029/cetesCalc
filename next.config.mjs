@@ -1,8 +1,6 @@
-import createMDX from '@next/mdx'
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
@@ -19,7 +17,7 @@ const nextConfig = {
       // Simplified chunk splitting to reduce loading failures
       config.optimization.splitChunks = {
         chunks: 'all',
-        maxSize: 200000, // Reduced chunk size further
+        maxSize: 200000,
         cacheGroups: {
           default: {
             minChunks: 2,
@@ -38,11 +36,11 @@ const nextConfig = {
     return config
   },
   
-  // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
-    unoptimized: true,
+    unoptimized: false, // Enable optimization for production
+    domains: [], // Add any external image domains here
   },
   
   async headers() {
@@ -75,62 +73,6 @@ const nextConfig = {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-        ],
-      },
-      {
-        source: '/favicon.ico',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'image/x-icon',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
-      {
-        source: '/(.*).jpg',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'image/jpeg',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
-      {
-        source: '/(.*).png',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'image/png',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
-      {
-        source: '/(.*).svg',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'image/svg+xml',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
         ],
       },
       {
@@ -149,15 +91,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Enable type checking for better production builds
   },
+  
+  output: 'standalone',
 }
 
-const withMDX = createMDX({
-  options: {
-    remarkPlugins: [],
-    rehypePlugins: [],
-  },
-})
-
-export default withMDX(nextConfig)
+export default nextConfig
