@@ -76,9 +76,9 @@
 }
 
 @theme inline {
-  /* Updated font variables to match Open Sans and Source Code Pro */
-  --font-sans: var(--font-open-sans);
-  --font-mono: var(--font-source-code-pro);
+  /* Updated font variables to match Noto Sans and Noto Sans Mono */
+  --font-sans: var(--font-noto-sans);
+  --font-mono: var(--font-noto-sans-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
