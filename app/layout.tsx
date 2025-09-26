@@ -49,82 +49,31 @@ export const metadata: Metadata = {
     description:
       "Calcula en tiempo real el rendimiento neto de tus CETES después de impuestos. Datos oficiales de Banxico. ¡Invierte inteligentemente!",
   },
-  other: {
-    preconnect: ["https://fonts.googleapis.com", "https://fonts.googleapis.com"],
-    "dns-prefetch": "https://www.banxico.org.mx",
-  },
 }
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#15803d",
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="es">
-      <body className={`font-sans ${notoSans.variable} ${notoSansMono.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                let chunkRetryCount = 0;
-                const MAX_CHUNK_RETRIES = 2;
-                
-                function handleChunkError(message) {
-                  if (chunkRetryCount < MAX_CHUNK_RETRIES) {
-                    chunkRetryCount++;
-                    console.warn('[v0] Chunk loading error, attempt ' + chunkRetryCount + ', retrying in 1s');
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 1000);
-                  } else {
-                    console.error('[v0] Max chunk retry attempts reached, manual reload required');
-                    // Show user-friendly error message
-                    if (typeof window !== 'undefined' && window.document) {
-                      const errorDiv = document.createElement('div');
-                      errorDiv.innerHTML = '<div style="position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:12px;border-radius:8px;z-index:9999;font-family:system-ui;">Error de carga. <button onclick="window.location.reload()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;margin-left:8px;cursor:pointer;">Recargar</button></div>';
-                      document.body.appendChild(errorDiv);
-                    }
-                  }
-                }
-                
-                window.addEventListener('error', function(e) {
-                  if (e.message && e.message.includes('Loading chunk')) {
-                    handleChunkError(e.message);
-                  }
-                });
-                
-                window.addEventListener('unhandledrejection', function(e) {
-                  if (e.reason && e.reason.toString().includes('Loading chunk')) {
-                    e.preventDefault();
-                    handleChunkError(e.reason.toString());
-                  }
-                });
-
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'G-9QP42RNK0G');
-                
-                // Load GA script after page load to avoid blocking
-                window.addEventListener('load', function() {
-                  var script = document.createElement('script');
-                  script.async = true;
-                  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G';
-                  document.head.appendChild(script);
-                });
-              `,
-            }}
-          />
-          <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
-          <Analytics />
+    <html lang="es" className={`${notoSans.variable} ${notoSansMono.variable} antialiased`} suppressHydrationWarning>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Suspense fallback={null}>{children}</Suspense>
           <Toaster />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
