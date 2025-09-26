@@ -1,12 +1,23 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
+import { Open_Sans, Source_Code_Pro } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+})
+
+const sourceCodePro = Source_Code_Pro({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500", "600"],
+})
 
 export const metadata: Metadata = {
   title: "Calculadora de Rendimiento CETES 2025 - Neto con ISR | Cetes.app",
@@ -39,7 +50,7 @@ export const metadata: Metadata = {
       "Calcula en tiempo real el rendimiento neto de tus CETES después de impuestos. Datos oficiales de Banxico. ¡Invierte inteligentemente!",
   },
   other: {
-    preconnect: ["https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+    preconnect: ["https://fonts.googleapis.com", "https://fonts.googleapis.com"],
     "dns-prefetch": "https://www.banxico.org.mx",
   },
 }
@@ -57,7 +68,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`font-sans ${openSans.variable} ${sourceCodePro.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <script
             dangerouslySetInnerHTML={{
