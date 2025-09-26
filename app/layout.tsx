@@ -4,6 +4,8 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -36,6 +38,10 @@ export const metadata: Metadata = {
     description:
       "Calcula en tiempo real el rendimiento neto de tus CETES después de impuestos. Datos oficiales de Banxico. ¡Invierte inteligentemente!",
   },
+  other: {
+    preconnect: ["https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+    "dns-prefetch": "https://www.banxico.org.mx",
+  },
 }
 
 export const viewport: Viewport = {
@@ -51,69 +57,64 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://www.banxico.org.mx" />
-        <link rel="icon" href="/favicon.ico" sizes="32x32" />
-        <link rel="icon" href="/favicon-16x16.jpg" sizes="16x16" type="image/png" />
-        <link rel="icon" href="/favicon-32x32.jpg" sizes="32x32" type="image/png" />
-      </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              let chunkRetryCount = 0;
-              const MAX_CHUNK_RETRIES = 2;
-              
-              function handleChunkError(message) {
-                if (chunkRetryCount < MAX_CHUNK_RETRIES) {
-                  chunkRetryCount++;
-                  console.warn('[v0] Chunk loading error, attempt ' + chunkRetryCount + ', retrying in 1s');
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 1000);
-                } else {
-                  console.error('[v0] Max chunk retry attempts reached, manual reload required');
-                  // Show user-friendly error message
-                  if (typeof window !== 'undefined' && window.document) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.innerHTML = '<div style="position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:12px;border-radius:8px;z-index:9999;font-family:system-ui;">Error de carga. <button onclick="window.location.reload()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;margin-left:8px;cursor:pointer;">Recargar</button></div>';
-                    document.body.appendChild(errorDiv);
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                let chunkRetryCount = 0;
+                const MAX_CHUNK_RETRIES = 2;
+                
+                function handleChunkError(message) {
+                  if (chunkRetryCount < MAX_CHUNK_RETRIES) {
+                    chunkRetryCount++;
+                    console.warn('[v0] Chunk loading error, attempt ' + chunkRetryCount + ', retrying in 1s');
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
+                  } else {
+                    console.error('[v0] Max chunk retry attempts reached, manual reload required');
+                    // Show user-friendly error message
+                    if (typeof window !== 'undefined' && window.document) {
+                      const errorDiv = document.createElement('div');
+                      errorDiv.innerHTML = '<div style="position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:12px;border-radius:8px;z-index:9999;font-family:system-ui;">Error de carga. <button onclick="window.location.reload()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;margin-left:8px;cursor:pointer;">Recargar</button></div>';
+                      document.body.appendChild(errorDiv);
+                    }
                   }
                 }
-              }
-              
-              window.addEventListener('error', function(e) {
-                if (e.message && e.message.includes('Loading chunk')) {
-                  handleChunkError(e.message);
-                }
-              });
-              
-              window.addEventListener('unhandledrejection', function(e) {
-                if (e.reason && e.reason.toString().includes('Loading chunk')) {
-                  e.preventDefault();
-                  handleChunkError(e.reason.toString());
-                }
-              });
+                
+                window.addEventListener('error', function(e) {
+                  if (e.message && e.message.includes('Loading chunk')) {
+                    handleChunkError(e.message);
+                  }
+                });
+                
+                window.addEventListener('unhandledrejection', function(e) {
+                  if (e.reason && e.reason.toString().includes('Loading chunk')) {
+                    e.preventDefault();
+                    handleChunkError(e.reason.toString());
+                  }
+                });
 
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-9QP42RNK0G');
-              
-              // Load GA script after page load to avoid blocking
-              window.addEventListener('load', function() {
-                var script = document.createElement('script');
-                script.async = true;
-                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G';
-                document.head.appendChild(script);
-              });
-            `,
-          }}
-        />
-        <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
-        <Analytics />
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-9QP42RNK0G');
+                
+                // Load GA script after page load to avoid blocking
+                window.addEventListener('load', function() {
+                  var script = document.createElement('script');
+                  script.async = true;
+                  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-9QP42RNK0G';
+                  document.head.appendChild(script);
+                });
+              `,
+            }}
+          />
+          <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>{children}</Suspense>
+          <Analytics />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )

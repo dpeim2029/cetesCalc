@@ -11,7 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Switch } from "@/components/ui/switch"
-import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Calculator, TrendingUp, Receipt, Banknote, Loader2, HelpCircle, RefreshCw } from "lucide-react"
 import type { CetesPlazo, CetesRate } from "@/lib/banxico-api"
 import { cn } from "@/lib/utils"
 
@@ -68,7 +69,16 @@ const CalculationResult = memo(
 
 CalculationResult.displayName = "CalculationResult"
 
-export function CetesCalculator() {
+interface CetesCalculatorProps {
+  initialData?: {
+    success: boolean
+    data: CetesRate[]
+    lastUpdated: string
+    source: string
+  }
+}
+
+export function CetesCalculator({ initialData }: CetesCalculatorProps) {
   const [amount, setAmount] = useState<string>("10000")
   const [displayAmount, setDisplayAmount] = useState<string>("10,000")
   const [selectedPlazo, setSelectedPlazo] = useState<CetesPlazo>("91")
@@ -78,14 +88,23 @@ export function CetesCalculator() {
     data: ratesResponse,
     error,
     isLoading,
+    mutate,
   } = useSWR("/api/cetes-rates", fetcher, {
-    refreshInterval: 300000, // Refresh every 5 minutes
+    fallbackData: initialData,
+    refreshInterval: 0, // No automatic refresh - user controls when to refresh
     revalidateOnFocus: false,
+    revalidateOnMount: !initialData,
+    dedupingInterval: 30000, // Dedupe requests for 30 seconds
   })
 
   const rates = ratesResponse?.data as CetesRate[] | undefined
   const lastUpdated = ratesResponse?.lastUpdated
   const dataSource = ratesResponse?.source
+
+  const apiRatesCount = useMemo(() => {
+    if (!rates) return 0
+    return rates.filter((rate) => rate.source === "api" || rate.source === "banxico").length
+  }, [rates])
 
   const currentRate = useMemo(() => {
     if (!rates) return 10.45 // Fallback rate while loading
@@ -97,6 +116,14 @@ export function CetesCalculator() {
     if (!rates) return null
     return rates.find((r) => r.plazo === selectedPlazo)
   }, [rates, selectedPlazo])
+
+  const handleManualRefresh = useCallback(async () => {
+    try {
+      await mutate() // Refresh SWR data
+    } catch (error) {
+      console.error("[v0] Manual refresh error:", error)
+    }
+  }, [mutate])
 
   const calculation = useMemo(() => {
     const numericAmount = Number.parseFloat(amount) || 0
@@ -162,6 +189,24 @@ export function CetesCalculator() {
             <CardTitle className="text-2xl font-bold">Rendimiento de CETES</CardTitle>
           </div>
           <CardDescription>Simula tu rendimiento neto después de impuestos en tiempo real</CardDescription>
+
+          {(error || dataSource === "fallback") && (
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <Badge variant="outline" className="text-xs">
+                {error ? "Error al obtener datos • Usando tasas de referencia" : "Usando datos de referencia"}
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleManualRefresh}
+                disabled={isLoading}
+                className="h-6 px-2 bg-transparent"
+              >
+                {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                <span className="ml-1 text-xs">{isLoading ? "Actualizando..." : "Actualizar"}</span>
+              </Button>
+            </div>
+          )}
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -228,15 +273,19 @@ export function CetesCalculator() {
                 </Badge>
                 {currentRateData && (
                   <Badge
-                    variant={currentRateData.source === "api" ? "default" : "outline"}
+                    variant={
+                      currentRateData.source === "api" || currentRateData.source === "banxico" ? "default" : "outline"
+                    }
                     className={cn(
                       "text-xs",
-                      currentRateData.source === "api"
+                      currentRateData.source === "api" || currentRateData.source === "banxico"
                         ? "bg-green-100 text-green-800 border-green-200"
                         : "bg-yellow-100 text-yellow-800 border-yellow-200",
                     )}
                   >
-                    {currentRateData.source === "api" ? "API Banxico" : "Datos Ref."}
+                    {currentRateData.source === "api" || currentRateData.source === "banxico"
+                      ? "Tiempo Real"
+                      : "Datos Ref."}
                   </Badge>
                 )}
               </div>
@@ -318,36 +367,33 @@ export function CetesCalculator() {
             </div>
           </div>
 
-          {/* Data Source Note */}
           <div className="text-xs text-muted-foreground text-center pt-2 border-t">
             {error ? (
               <span className="text-red-500">Error al obtener tasas • Usando tasas de referencia</span>
+            ) : dataSource === "banxico" ? (
+              <>
+                <span className="text-green-600 font-medium">✓ Datos en tiempo real desde Banxico</span>
+                <br />
+                Última actualización:{" "}
+                {lastUpdated
+                  ? new Date(lastUpdated).toLocaleDateString("es-MX", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "No disponible"}
+              </>
             ) : (
               <>
-                {dataSource === "database" ? (
-                  <>
-                    <span className="text-green-600 font-medium">✓ Datos actualizados desde Banxico</span> • Última
-                    actualización:{" "}
-                    {lastUpdated
-                      ? new Date(lastUpdated).toLocaleDateString("es-MX", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "No disponible"}
-                  </>
-                ) : (
-                  <>
-                    <span className="text-yellow-600 font-medium">⚠ Usando datos de referencia</span> • Tasas
-                    actualizadas automáticamente días hábiles a las 6:00 AM y 1:00 PM
-                  </>
-                )}
+                <span className="text-blue-600 font-medium">ℹ Usando datos oficiales de referencia</span>
                 <br />
-                Tasa de retención ISR provisional {isrYear}: {isrYear === 2025 ? "0.50%" : "0.90%"}
+                Tasas oficiales actualizadas automáticamente días hábiles
               </>
             )}
+            <br />
+            Tasa de retención ISR provisional {isrYear}: {isrYear === 2025 ? "0.50%" : "0.90%"}
           </div>
         </CardContent>
       </Card>

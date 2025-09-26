@@ -40,12 +40,11 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Fetch rates from Banxico API
     const banxicoResponse = await fetch(
-      "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43783,SF43878,SF43883,SF43878/datos/oportuno",
+      "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43936,SF43939,SF43942,SF43945/datos/oportuno",
       {
         headers: {
-          "Bmx-Token": process.env.BANXICO_API_KEY || "demo-key",
+          "Bmx-Token": process.env.BANXICO_TOKEN || "191860f124b2b1f7747333cb34affe8ee0c8059161416c3d8e8a483282693043",
         },
       },
     )
@@ -56,7 +55,6 @@ export async function GET(request: NextRequest) {
 
     const banxicoData = await banxicoResponse.json()
 
-    // Parse the rates (adjust based on actual Banxico API response structure)
     const series = banxicoData.bmx?.series || []
     const rates = {
       rate_28_days: 0,
@@ -65,27 +63,32 @@ export async function GET(request: NextRequest) {
       rate_364_days: 0,
     }
 
-    // Map series to rates (you may need to adjust these series IDs)
+    // Map series to rates with correct series IDs
     series.forEach((serie: any) => {
       const latestData = serie.datos?.[0]
       if (latestData?.dato) {
         const rate = Number.parseFloat(latestData.dato)
         switch (serie.idSerie) {
-          case "SF43783": // 28 days
+          case "SF43936": // 28 days
             rates.rate_28_days = rate
             break
-          case "SF43878": // 91 days
+          case "SF43939": // 91 days
             rates.rate_91_days = rate
             break
-          case "SF43883": // 182 days
+          case "SF43942": // 182 days
             rates.rate_182_days = rate
             break
-          case "SF43878": // 364 days (adjust series ID)
+          case "SF43945": // 364 days
             rates.rate_364_days = rate
             break
         }
       }
     })
+
+    const validRates = Object.values(rates).filter((rate) => rate > 0).length
+    if (validRates === 0) {
+      throw new Error("No valid rates received from Banxico API")
+    }
 
     // Mark all previous rates as not current
     await supabase.from("cetes_rates").update({ is_current: false }).eq("is_current", true)
@@ -116,6 +119,7 @@ export async function GET(request: NextRequest) {
       success: true,
       message: "Rates updated successfully",
       rates,
+      validRates,
       timestamp: now.toISOString(),
     })
   } catch (error) {
