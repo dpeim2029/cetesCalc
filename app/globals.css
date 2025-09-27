@@ -11,14 +11,14 @@
   --card-foreground: oklch(0.145 0 0); /* #1f2937 - Card text */
   --popover: oklch(1 0 0); /* #ffffff - Popover background */
   --popover-foreground: oklch(0.145 0 0); /* #1f2937 - Popover text */
-  --primary: oklch(0.646 0.222 160); /* #10b981 - Vibrant emerald green */
-  --primary-foreground: oklch(1 0 0); /* #ffffff - White text on green */
+  --primary: oklch(0.205 0 0); /* #10b981 - Vibrant emerald green */
+  --primary-foreground: oklch(0.985 0 0); /* #ffffff - White text on green */
   --secondary: oklch(0.97 0 0); /* #f3f4f6 - Light gray background */
   --secondary-foreground: oklch(0.205 0 0); /* #1f2937 - Dark text */
   --muted: oklch(0.97 0 0); /* #f3f4f6 - Muted background */
   --muted-foreground: oklch(0.556 0 0); /* #6b7280 - Muted text */
-  --accent: oklch(0.728 0.189 160); /* #34d399 - Light green accent */
-  --accent-foreground: oklch(0.145 0 0); /* #1f2937 - Dark text on accent */
+  --accent: oklch(0.97 0 0); /* #f3f4f6 - Light green accent */
+  --accent-foreground: oklch(0.205 0 0); /* #1f2937 - Dark text on accent */
   --destructive: oklch(0.577 0.245 27.325); /* #ef4444 - Red for errors */
   --destructive-foreground: oklch(0.577 0.245 27.325); /* #ef4444 - Red for errors */
   --border: oklch(0.922 0 0); /* #e5e7eb - Light borders */
@@ -76,6 +76,7 @@
 }
 
 @theme inline {
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -119,6 +120,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
   }
 }
