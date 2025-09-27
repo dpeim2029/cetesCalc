@@ -11,18 +11,20 @@
   --card-foreground: oklch(0.145 0 0); /* #1f2937 - Card text */
   --popover: oklch(1 0 0); /* #ffffff - Popover background */
   --popover-foreground: oklch(0.145 0 0); /* #1f2937 - Popover text */
-  --primary: oklch(0.205 0 0); /* #10b981 - Vibrant emerald green */
+  /* Fixed primary color to vibrant emerald green */
+  --primary: oklch(0.646 0.222 162.48); /* #10b981 - Vibrant emerald green */
   --primary-foreground: oklch(0.985 0 0); /* #ffffff - White text on green */
   --secondary: oklch(0.97 0 0); /* #f3f4f6 - Light gray background */
   --secondary-foreground: oklch(0.205 0 0); /* #1f2937 - Dark text */
   --muted: oklch(0.97 0 0); /* #f3f4f6 - Muted background */
   --muted-foreground: oklch(0.556 0 0); /* #6b7280 - Muted text */
-  --accent: oklch(0.97 0 0); /* #f3f4f6 - Light green accent */
-  --accent-foreground: oklch(0.205 0 0); /* #1f2937 - Dark text on accent */
+  /* Fixed accent color to light emerald green */
+  --accent: oklch(0.828 0.189 162.48); /* #34d399 - Light emerald green accent */
+  --accent-foreground: oklch(0.145 0 0); /* #1f2937 - Dark text on accent */
   --destructive: oklch(0.577 0.245 27.325); /* #ef4444 - Red for errors */
-  --destructive-foreground: oklch(0.577 0.245 27.325); /* #ffffff - White text on red */
+  --destructive-foreground: oklch(0.985 0 0); /* #ffffff - White text on red */
   --border: oklch(0.922 0 0); /* #e5e7eb - Light borders */
-  --input: oklch(0.922 0 0); /* #ffffff - White input backgrounds */
+  --input: oklch(1 0 0); /* #ffffff - White input backgrounds */
   --ring: oklch(0.708 0 0); /* Green focus ring */
   --chart-1: oklch(0.646 0.222 41.116); /* #34d399 - Chart green 1 */
   --chart-2: oklch(0.6 0.118 184.704); /* #10b981 - Chart green 2 */
@@ -32,7 +34,7 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.646 0.222 162.48);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
@@ -47,12 +49,14 @@
   --card-foreground: oklch(0.985 0 0); /* #f9fafb - Light card text */
   --popover: oklch(0.145 0 0); /* #1f2937 - Dark popover */
   --popover-foreground: oklch(0.985 0 0); /* #f9fafb - Light popover text */
+  /* Fixed dark mode primary to bright emerald green */
   --primary: oklch(0.985 0 0); /* #34d399 - Bright green for dark mode */
   --primary-foreground: oklch(0.205 0 0); /* #111827 - Dark text on green */
   --secondary: oklch(0.269 0 0); /* #374151 - Dark secondary background */
   --secondary-foreground: oklch(0.985 0 0); /* #f9fafb - Light secondary text */
   --muted: oklch(0.269 0 0); /* #374151 - Dark muted background */
   --muted-foreground: oklch(0.708 0 0); /* #9ca3af - Muted text */
+  /* Fixed dark mode accent to emerald green */
   --accent: oklch(0.269 0 0); /* #10b981 - Green accent */
   --accent-foreground: oklch(0.985 0 0); /* #f9fafb - Light text on accent */
   --destructive: oklch(0.396 0.141 25.723); /* #ef4444 - Red for errors */
