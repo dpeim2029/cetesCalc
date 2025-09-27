@@ -160,4 +160,5 @@ const withMDX = createMDX({
   },
 })
 
+/* removed automated reminder that was breaking JavaScript syntax */
 export default withMDX(nextConfig)
