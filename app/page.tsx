@@ -1,16 +1,9 @@
-import { Suspense, lazy } from "react"
 import { CetesCalculator } from "@/components/cetes-calculator"
 import { BrandHeader } from "@/components/brand-header"
-import { LoadingSpinner } from "@/components/loading-spinner"
 import { FAQSection } from "@/components/faq-section"
-
-const RatesDashboard = lazy(() => import("@/components/rates-dashboard").then((m) => ({ default: m.RatesDashboard })))
-const HistoricalChart = lazy(() =>
-  import("@/components/historical-chart").then((m) => ({ default: m.HistoricalChart })),
-)
-const EducationSection = lazy(() =>
-  import("@/components/education-section").then((m) => ({ default: m.EducationSection })),
-)
+import { RatesDashboard } from "@/components/rates-dashboard"
+import { HistoricalChart } from "@/components/historical-chart"
+import { EducationSection } from "@/components/education-section"
 
 export default function HomePage() {
   return (
@@ -18,37 +11,31 @@ export default function HomePage() {
       <BrandHeader />
 
       <main className="container mx-auto px-4 py-12 space-y-16">
-        {/* Cetes Calculator - Feature Estrella - Above the fold, no lazy loading */}
+        {/* Cetes Calculator - Feature Estrella - Above the fold */}
         <section id="calculadora" className="flex justify-center animate-fade-in">
           <div className="w-full max-w-4xl">
             <CetesCalculator />
           </div>
         </section>
 
-        {/* Current Rates Dashboard - Lazy loaded */}
+        {/* Current Rates Dashboard */}
         <section className="flex justify-center animate-slide-up">
           <div className="w-full max-w-6xl">
-            <Suspense fallback={<LoadingSpinner />}>
-              <RatesDashboard />
-            </Suspense>
+            <RatesDashboard />
           </div>
         </section>
 
-        {/* Historical Chart - Lazy loaded */}
+        {/* Historical Chart */}
         <section className="flex justify-center animate-slide-up">
           <div className="w-full max-w-6xl">
-            <Suspense fallback={<LoadingSpinner />}>
-              <HistoricalChart />
-            </Suspense>
+            <HistoricalChart />
           </div>
         </section>
 
         {/* Education Section */}
         <section className="flex justify-center animate-slide-up">
           <div className="w-full max-w-4xl">
-            <Suspense fallback={<LoadingSpinner />}>
-              <EducationSection />
-            </Suspense>
+            <EducationSection />
           </div>
         </section>
 
