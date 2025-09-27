@@ -1,3 +1,5 @@
+import { apiCache } from "./cache"
+
 const BANXICO_BASE_URL = "https://www.banxico.org.mx/SieAPIRest/service/v1"
 const BANXICO_TOKEN = process.env.BANXICO_TOKEN || "191860f124b2b1f7747333cb34affe8ee0c8059161416c3d8e8a483282693043"
 
@@ -30,6 +32,13 @@ export interface HistoricalData {
 export const ISR_RETENTION_RATE = 0.005 // 0.50% for 2025
 
 export async function fetchCetesRates(): Promise<CetesRate[]> {
+  const cacheKey = "cetes-rates"
+  const cached = apiCache.get<CetesRate[]>(cacheKey)
+
+  if (cached) {
+    return cached
+  }
+
   const results: CetesRate[] = []
 
   const fetchPromises = Object.entries(CETES_SERIES).map(async ([plazo, seriesId]) => {
@@ -38,7 +47,7 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
         headers: {
           "Bmx-Token": BANXICO_TOKEN,
         },
-        cache: "no-store", // Force fresh data
+        next: { revalidate: 1800 },
       })
 
       if (currentResponse.ok) {
@@ -60,7 +69,7 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
               headers: {
                 "Bmx-Token": BANXICO_TOKEN,
               },
-              cache: "no-store",
+              next: { revalidate: 1800 },
             },
           )
 
@@ -129,6 +138,7 @@ export async function fetchCetesRates(): Promise<CetesRate[]> {
     }
   })
 
+  apiCache.set(cacheKey, results, 30)
   return results
 }
 
@@ -137,13 +147,20 @@ export async function fetchHistoricalData(
   startDate: string,
   endDate: string,
 ): Promise<HistoricalData[]> {
+  const cacheKey = `historical-${plazo}-${startDate}-${endDate}`
+  const cached = apiCache.get<HistoricalData[]>(cacheKey)
+
+  if (cached) {
+    return cached
+  }
+
   try {
     const seriesId = CETES_SERIES[plazo]
     const response = await fetch(`${BANXICO_BASE_URL}/series/${seriesId}/datos/${startDate}/${endDate}`, {
       headers: {
         "Bmx-Token": BANXICO_TOKEN,
       },
-      cache: "no-store",
+      next: { revalidate: 3600 },
     })
 
     if (!response.ok) {
@@ -155,6 +172,8 @@ export async function fetchHistoricalData(
       fecha: item.fecha,
       [plazo]: Number.parseFloat(item.dato),
     }))
+
+    apiCache.set(cacheKey, historicalData, 240)
 
     return historicalData
   } catch (error) {

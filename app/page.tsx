@@ -3,7 +3,6 @@ import { CetesCalculator } from "@/components/cetes-calculator"
 import { BrandHeader } from "@/components/brand-header"
 import { LoadingSpinner } from "@/components/loading-spinner"
 import { FAQSection } from "@/components/faq-section"
-import { createClient } from "@/lib/supabase/server"
 
 const RatesDashboard = lazy(() => import("@/components/rates-dashboard").then((m) => ({ default: m.RatesDashboard })))
 const HistoricalChart = lazy(() =>
@@ -13,63 +12,7 @@ const EducationSection = lazy(() =>
   import("@/components/education-section").then((m) => ({ default: m.EducationSection })),
 )
 
-async function getCetesRates() {
-  try {
-    const supabase = await createClient()
-
-    // Get the most recent rates from database
-    const { data: currentRates, error } = await supabase.from("cetes_rates").select("*").eq("is_current", true).single()
-
-    if (error || !currentRates) {
-      // Fallback to reference rates if no data in database
-      return {
-        success: true,
-        data: [
-          { plazo: "28", tasa: 10.45, source: "fallback", lastUpdated: "2025-03-31" },
-          { plazo: "91", tasa: 10.25, source: "fallback", lastUpdated: "2025-03-31" },
-          { plazo: "182", tasa: 10.15, source: "fallback", lastUpdated: "2025-03-31" },
-          { plazo: "364", tasa: 10.05, source: "fallback", lastUpdated: "2025-03-31" },
-        ],
-        lastUpdated: new Date().toISOString(),
-        source: "fallback",
-      }
-    }
-
-    // Transform database format to expected API format
-    const rates = [
-      { plazo: "28", tasa: currentRates.rate_28_days, source: "database", lastUpdated: currentRates.fetched_at },
-      { plazo: "91", tasa: currentRates.rate_91_days, source: "database", lastUpdated: currentRates.fetched_at },
-      { plazo: "182", tasa: currentRates.rate_182_days, source: "database", lastUpdated: currentRates.fetched_at },
-      { plazo: "364", tasa: currentRates.rate_364_days, source: "database", lastUpdated: currentRates.fetched_at },
-    ]
-
-    return {
-      success: true,
-      data: rates,
-      lastUpdated: currentRates.fetched_at,
-      source: "database",
-    }
-  } catch (error) {
-    console.error("SSR Data fetch error:", error)
-
-    // Return fallback rates on error
-    return {
-      success: true,
-      data: [
-        { plazo: "28", tasa: 10.45, source: "fallback", lastUpdated: "2025-03-31" },
-        { plazo: "91", tasa: 10.25, source: "fallback", lastUpdated: "2025-03-31" },
-        { plazo: "182", tasa: 10.15, source: "fallback", lastUpdated: "2025-03-31" },
-        { plazo: "364", tasa: 10.05, source: "fallback", lastUpdated: "2025-03-31" },
-      ],
-      lastUpdated: new Date().toISOString(),
-      source: "fallback",
-    }
-  }
-}
-
-export default async function HomePage() {
-  const initialRatesData = await getCetesRates()
-
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <BrandHeader />
@@ -78,7 +21,7 @@ export default async function HomePage() {
         {/* Cetes Calculator - Feature Estrella - Above the fold, no lazy loading */}
         <section id="calculadora" className="flex justify-center animate-fade-in">
           <div className="w-full max-w-4xl">
-            <CetesCalculator initialData={initialRatesData} />
+            <CetesCalculator />
           </div>
         </section>
 
@@ -165,5 +108,3 @@ export default async function HomePage() {
     </div>
   )
 }
-
-export const revalidate = 3600 // Revalidate every hour
