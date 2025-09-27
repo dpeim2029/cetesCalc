@@ -219,9 +219,6 @@ importers:
       tailwindcss:
         specifier: ^4.1.9
         version: 4.1.9
-      tw-animate-css:
-        specifier: 1.3.3
-        version: 1.3.3
       typescript:
         specifier: ^5
         version: 5.0.2
@@ -2779,9 +2776,6 @@ packages:
 
   turbo-stream@2.4.1:
     resolution: {integrity: sha512-v8kOJXpG3WoTN/+at8vK7erSzo6nW6CIaeOvNOkHQVDajfz1ZVeSxCbc6tOH4hrGZW7VUCV0TOXd8CPzYnYkrw==}
-
-  tw-animate-css@1.3.3:
-    resolution: {integrity: sha512-tXE2TRWrskc4TU3RDd7T8n8Np/wCfoeH9gz22c7PzYqNPQ9FBGFbWWzwL0JyHcFp+jHozmF76tbHfPAx22ua2Q==}
 
   typescript@5.0.2:
     resolution: {integrity: sha512-wVORMBGO/FAs/++blGNeAVdbNKtIh1rbBL2EyQ1+J9lClJ93KiiKe8PmFIVdXhHcyv44SL9oglmfeSsndo0jRw==}
@@ -5732,8 +5726,6 @@ snapshots:
   tslib@2.8.1: {}
 
   turbo-stream@2.4.1: {}
-
-  tw-animate-css@1.3.3: {}
 
   typescript@5.0.2: {}
 
